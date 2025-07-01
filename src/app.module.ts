@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './roles/role.module';
@@ -18,10 +16,10 @@ import { AppService } from './app.service';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: +(process.env.DB_PORT || 5432),
-      username: process.env.DB_USERNAME || 'sa',
+      port: +(process.env.DB_PORT || 5433),
+      username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'Momna292003.',
-      database: process.env.DB_DATABASE || 'NestJS',
+      database: process.env.DB_DATABASE || 'Attendance',
       entities: [Role, User],
       synchronize: true,
     }),

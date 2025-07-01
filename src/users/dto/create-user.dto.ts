@@ -4,10 +4,9 @@ import {
   MinLength,
   IsEmail,
   IsBoolean,
-  IsUUID,
+  IsInt,
   IsDate,
 } from 'class-validator';
-import { CreateRoleDto } from 'src/roles/dtos/create-role.dto';
 
 export class CreateUserDto {
   @IsString()
@@ -62,11 +61,6 @@ export class CreateUserDto {
   @MaxLength(16)
   probationPeriod: string;
 
-  @IsUUID()
-  lineManagerID: string;
-
-  @IsUUID()
-  finalAuthorityID: string;
-
-  role: CreateRoleDto;
+  @IsInt()
+  roleId: number;
 }

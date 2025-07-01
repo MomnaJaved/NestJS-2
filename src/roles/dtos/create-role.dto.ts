@@ -1,15 +1,11 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 
 export class CreateRoleDto {
-  @IsString({ message: 'Name should be a string value.' })
-  @MinLength(2, { message: 'Name should have a minimum of 5 characters.' })
+  @IsString()
   @MaxLength(100)
   name: string;
 
-  @IsString({ message: 'Description should be a string value.' })
-  @MinLength(10, {
-    message: 'Description should have a minimum of 10 characters.',
-  })
+  @IsString()
   @MaxLength(200)
   description: string;
 }

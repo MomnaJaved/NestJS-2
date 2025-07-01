@@ -10,7 +10,7 @@ import {
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid') // Auto-generated UUID for User ID
   id: string;
 
   @Column({ type: 'varchar', length: 24 })
@@ -67,7 +67,10 @@ export class User {
   @Column({ type: 'uuid', nullable: true })
   createdBy: string;
 
+  @Column({ type: 'int' })
+  roleId: number;
+
   @ManyToOne(() => Role)
-  @JoinColumn({ name: 'Role_id', referencedColumnName: 'id' })
-  role: Role;
+  @JoinColumn({ name: 'roleId', referencedColumnName: 'id' })
+  role: Role; // This is just for TypeORM to know about the relation, but `roleId` is now used directly
 }
