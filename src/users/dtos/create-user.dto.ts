@@ -6,6 +6,8 @@ import {
   IsBoolean,
   IsInt,
   IsDate,
+  IsOptional,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -52,15 +54,39 @@ export class CreateUserDto {
 
   @IsString()
   @MaxLength(32)
+  @IsOptional()
   designation: string;
 
   @IsDate()
-  joiningDate: Date;
+  @IsOptional()
+  joiningDate?: Date; // Optional for students
 
   @IsString()
   @MaxLength(16)
-  probationPeriod: string;
+  @IsOptional()
+  probationPeriod?: string; // Optional for students
+
+  @IsUUID()
+  @IsOptional()
+  lineManagerID?: string; // Optional for students
+
+  @IsString()
+  @MaxLength(32)
+  @IsOptional()
+  program?: string; // Optional for faculty
+
+  @IsDate()
+  @IsOptional()
+  admissionDate?: Date; // Optional for faculty
+
+  @IsString()
+  @MaxLength(16)
+  @IsOptional()
+  programDuration?: string; // Optional for faculty
 
   @IsInt()
   roleId: number;
+
+  @IsInt()
+  departmentId: string;
 }

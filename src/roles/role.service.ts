@@ -32,4 +32,11 @@ export class RoleService {
   public getRoles() {
     return this.roleRepository.find();
   }
+
+  // Find role by ID
+  public async findRoleById(id: number): Promise<Role | null> {
+    return this.roleRepository.findOne({
+      where: { id },
+    });
+  }
 }

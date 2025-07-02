@@ -1,3 +1,5 @@
+import { Attendance } from '../attendance/attendance.entity';
+import { Department } from '../departments/department.entity';
 import { Role } from 'src/roles/role.entity';
 import {
   Entity,
@@ -5,12 +7,12 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
-
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid') // Auto-generated UUID for User ID
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 24 })
@@ -46,20 +48,17 @@ export class User {
   @Column({ type: 'varchar', length: 16 })
   CNIC: string;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 32, nullable: true })
   designation: string;
 
-  @Column({ type: 'date' })
-  joiningDate: Date;
+  @Column({ type: 'date', nullable: true })
+  joiningDate: Date; // Optional for students
 
-  @Column({ type: 'varchar', length: 16 })
-  probationPeriod: string;
+  @Column({ type: 'varchar', length: 16, nullable: true })
+  probationPeriod: string; // Optional for students
 
-  @Column({ type: 'uuid' })
-  lineManagerID: string;
-
-  @Column({ type: 'uuid' })
-  finalAuthorityID: string;
+  @Column({ type: 'uuid', nullable: true })
+  lineManagerID: string; // Optional for students
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -67,10 +66,23 @@ export class User {
   @Column({ type: 'uuid', nullable: true })
   createdBy: string;
 
-  @Column({ type: 'int' })
-  roleId: number;
-
   @ManyToOne(() => Role)
   @JoinColumn({ name: 'roleId', referencedColumnName: 'id' })
-  role: Role; // This is just for TypeORM to know about the relation, but `roleId` is now used directly
+  role: Role;
+
+  @ManyToOne(() => Department)
+  @JoinColumn({ name: 'departmentId', referencedColumnName: 'id' })
+  department: Department;
+
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  program: string; // Optional for faculty
+
+  @Column({ type: 'date', nullable: true })
+  admissionDate: Date; // Optional for faculty
+
+  @Column({ type: 'varchar', length: 16, nullable: true })
+  programDuration: string; // Optional for faculty
+
+  @OneToMany(() => Attendance, (attendance) => attendance.user) // One-to-many relationship with Attendance
+  attendances: Attendance[];
 }
