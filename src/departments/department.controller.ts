@@ -7,7 +7,6 @@ import { Department } from './department.entity';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
-  // Endpoint to create a new department
   @Post()
   async createDepartment(
     @Body() createDepartmentDto: CreateDepartmentDto,
@@ -15,13 +14,11 @@ export class DepartmentController {
     return this.departmentService.createDepartment(createDepartmentDto);
   }
 
-  // Endpoint to get all departments
   @Get()
   async getAllDepartments(): Promise<Department[]> {
     return this.departmentService.getAllDepartments();
   }
 
-  // Endpoint to get a department by ID
   @Get(':id')
   async getDepartmentById(@Param('id') id: string): Promise<Department> {
     return this.departmentService.getDepartmentById(id);

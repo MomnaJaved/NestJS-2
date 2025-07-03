@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { User } from '../users/user.entity'; // Reference to User entity
+import { User } from '../users/user.entity';
 
 @Entity()
 export class Department {
@@ -12,6 +12,6 @@ export class Department {
   @Column({ type: 'varchar', length: 200 })
   description: string;
 
-  @OneToMany(() => User, (user) => user.department) // One-to-many relationship with User
+  @OneToMany(() => User, (user) => user.department)
   users: User[];
 }

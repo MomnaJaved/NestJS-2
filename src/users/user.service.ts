@@ -8,9 +8,9 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { RoleService } from '../roles/role.service'; // Correct role service import
-import { DepartmentService } from '../departments/department.service'; // Correct department service import
-import * as bcrypt from 'bcrypt'; // Import bcrypt for password hashing
+import { RoleService } from '../roles/role.service';
+import { DepartmentService } from '../departments/department.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {

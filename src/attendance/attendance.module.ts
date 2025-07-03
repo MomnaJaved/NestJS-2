@@ -7,9 +7,7 @@ import { User } from '../users/user.entity';
 import { Department } from '../departments/department.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Attendance, User, Department]), // Import related entities
-  ],
+  imports: [TypeOrmModule.forFeature([Attendance, User, Department])],
   controllers: [AttendanceController],
   providers: [AttendanceService],
 })

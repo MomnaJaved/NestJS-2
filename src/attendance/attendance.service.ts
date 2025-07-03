@@ -20,7 +20,7 @@ export class AttendanceService {
   // Create new attendance entry
   async createAttendance(createAttendanceDto: CreateAttendanceDto) {
     const user = await this.userRepository.findOne({
-      where: { id: createAttendanceDto.userId }, // Ensure `userId` is the correct UUID
+      where: { id: createAttendanceDto.userId },
     });
     if (!user) {
       throw new NotFoundException(
@@ -29,7 +29,7 @@ export class AttendanceService {
     }
 
     const department = await this.departmentRepository.findOne({
-      where: { id: createAttendanceDto.departmentId }, // Ensure `departmentId` is the correct UUID
+      where: { id: createAttendanceDto.departmentId },
     });
     if (!department) {
       throw new NotFoundException(

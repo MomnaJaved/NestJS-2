@@ -1,7 +1,7 @@
 import { IsUUID, IsBoolean, IsDate } from 'class-validator';
 
 export class CreateAttendanceDto {
-  @IsUUID() // Make sure userId and departmentId are UUIDs
+  @IsUUID()
   userId: string;
 
   @IsUUID()

@@ -5,8 +5,8 @@ import {
   JoinColumn,
   Column,
 } from 'typeorm';
-import { User } from '../users/user.entity'; // Reference to User entity
-import { Department } from '../departments/department.entity'; // Reference to Department entity
+import { User } from '../users/user.entity';
+import { Department } from '../departments/department.entity';
 
 @Entity()
 export class Attendance {

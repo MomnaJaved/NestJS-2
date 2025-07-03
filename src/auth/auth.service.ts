@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import * as bcrypt from 'bcrypt'; // Import bcrypt
+import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../users/user.service'; // Import UsersService
-import { LoginDto } from './dtos/login.dto'; // Your DTO to receive login info
-import { JwtPayload } from './interfaces/jwt-payload.interface'; // JWT Payload Interface
-import { ConfigService } from '@nestjs/config'; // Import ConfigService
+import { UserService } from '../users/user.service';
+import { LoginDto } from './dtos/login.dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UserService, // Inject UsersService
-    private readonly jwtService: JwtService, // Inject JwtService
-    private readonly configService: ConfigService, // Inject ConfigService
+    private readonly usersService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   // Validate user with bcrypt comparison
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findOneByEmail(username); // Adjust this method
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findOneByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       // Use bcrypt.compare to validate the password (hashed password comparison)
       return user;
@@ -35,9 +35,9 @@ export class AuthService {
 
     // Generate JWT token with user information
     const payload: JwtPayload = {
-      username: user.email,
+      email: user.email,
       sub: user.id,
-      role: user.role, // Ensure `role` is included in the payload
+      role: user.role,
     };
 
     const secret = this.configService.get<string>('JWT_SECRET_KEY'); // Get secret from environment variables

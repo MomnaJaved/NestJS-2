@@ -7,8 +7,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { User } from '../users/user.entity'; // Import the User entity
-import { Role } from '../roles/role.entity'; // Import the Role entity
+import { User } from '../users/user.entity';
+import { Role } from '../roles/role.entity';
 
 @Injectable()
 export class RoleGuard implements CanActivate {

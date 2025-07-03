@@ -5,9 +5,9 @@ import { DepartmentService } from './department.service';
 import { DepartmentController } from './department.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Department])], // Make Department entity available for injection
+  imports: [TypeOrmModule.forFeature([Department])],
   providers: [DepartmentService],
   controllers: [DepartmentController],
-  exports: [DepartmentService, TypeOrmModule], // Export the service and TypeOrmModule for other modules
+  exports: [DepartmentService, TypeOrmModule],
 })
 export class DepartmentModule {}

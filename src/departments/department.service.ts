@@ -21,7 +21,7 @@ export class DepartmentService {
 
   // Get all departments
   async getAllDepartments(): Promise<Department[]> {
-    return this.departmentRepository.find(); // Get all departments
+    return this.departmentRepository.find();
   }
 
   // Get department by ID
