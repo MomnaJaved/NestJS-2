@@ -5,15 +5,20 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { RoleModule } from 'src/roles/role.module'; // Import RoleModule
 import { DepartmentModule } from 'src/departments/department.module'; // Import DepartmentModule
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]), // Import User entity
-    RoleModule, // Import RoleModule to have access to RoleRepository
-    DepartmentModule, // Import DepartmentModule to have access to DepartmentRepository
+    TypeOrmModule.forFeature([User]), // This makes the UserRepository available
+    RoleModule,
+    DepartmentModule,
+    JwtModule.register({
+      secret: 'mySuperSecretKey12345', // Add your JWT secret here, or use ConfigService for dynamic values
+      signOptions: { expiresIn: '1h' },
+    }),
   ],
   providers: [UserService],
   controllers: [UserController],
-  exports: [UserService],
+  exports: [UserService], // Ensure the UserService is exported
 })
 export class UserModule {}

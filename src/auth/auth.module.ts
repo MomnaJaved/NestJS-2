@@ -1,21 +1,28 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { UserModule } from '../users/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // Load environment variables
+    ConfigModule.forRoot(),
+    UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET_KEY'), // Access secret from env
+        secret:
+          configService.get<string>('JWT_SECRET_KEY') ||
+          'mySuperSecretKey12345',
         signOptions: { expiresIn: '1h' },
       }),
       inject: [ConfigService],
     }),
   ],
+  controllers: [AuthController],
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}

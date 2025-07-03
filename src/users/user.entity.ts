@@ -10,6 +10,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -21,7 +22,7 @@ export class User {
   @Column({ type: 'varchar', length: 24 })
   lastName: string;
 
-  @Column({ type: 'varchar', length: 24 })
+  @Column({ type: 'varchar' })
   password: string;
 
   @Column({ type: 'varchar' })
@@ -52,13 +53,13 @@ export class User {
   designation: string;
 
   @Column({ type: 'date', nullable: true })
-  joiningDate: Date; // Optional for students
+  joiningDate: Date;
 
   @Column({ type: 'varchar', length: 16, nullable: true })
-  probationPeriod: string; // Optional for students
+  probationPeriod: string;
 
   @Column({ type: 'uuid', nullable: true })
-  lineManagerID: string; // Optional for students
+  lineManagerID: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -68,21 +69,21 @@ export class User {
 
   @ManyToOne(() => Role)
   @JoinColumn({ name: 'roleId', referencedColumnName: 'id' })
-  role: Role;
+  role: Role; // Corrected to refer directly to Role entity
 
   @ManyToOne(() => Department)
   @JoinColumn({ name: 'departmentId', referencedColumnName: 'id' })
   department: Department;
 
   @Column({ type: 'varchar', length: 32, nullable: true })
-  program: string; // Optional for faculty
+  program: string;
 
   @Column({ type: 'date', nullable: true })
-  admissionDate: Date; // Optional for faculty
+  admissionDate: Date;
 
   @Column({ type: 'varchar', length: 16, nullable: true })
-  programDuration: string; // Optional for faculty
+  programDuration: string;
 
-  @OneToMany(() => Attendance, (attendance) => attendance.user) // One-to-many relationship with Attendance
+  @OneToMany(() => Attendance, (attendance) => attendance.user)
   attendances: Attendance[];
 }

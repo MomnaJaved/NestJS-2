@@ -7,17 +7,14 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
-import { User } from 'src/users/user.entity'; // Import the User entity
-import { Role } from 'src/roles/role.entity'; // Import the Role entity
+import { User } from '../users/user.entity'; // Import the User entity
+import { Role } from '../roles/role.entity'; // Import the Role entity
 
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     // Get the roles metadata set on the route handler
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
 

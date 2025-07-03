@@ -33,10 +33,11 @@ export class RoleService {
     return this.roleRepository.find();
   }
 
-  // Find role by ID
-  public async findRoleById(id: number): Promise<Role | null> {
+  // Fetch role by roleId, treating roleId as a number
+  async findRoleById(roleId: number): Promise<Role | null> {
+    // Use `where` to query based on `id`
     return this.roleRepository.findOne({
-      where: { id },
+      where: { id: roleId }, // Specify the query structure correctly
     });
   }
 }

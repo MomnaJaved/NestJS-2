@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.entity';
 import { Role } from '../roles/role.entity';
 import { Department } from '../departments/department.entity';
-
+import { DeepPartial } from 'typeorm';
 @Injectable()
 export class AdminSeed {
   constructor(
@@ -56,10 +56,12 @@ export class AdminSeed {
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
     // Create admin user
-    const newAdmin = this.userRepository.create({
+
+    const newAdmin: DeepPartial<User> = {
       firstName: 'Javed',
       lastName: 'Iqbal',
       password: hashedPassword,
+      contact: '03123456789',
       email: 'javediqbal@gmail.com',
       status: true,
       code: 'EMP001',
@@ -67,15 +69,17 @@ export class AdminSeed {
       DOB: new Date('1990-01-01'),
       maritalStatus: 'Single',
       CNIC: '1234567890123',
-      program: 'Admin Program',
+      designation: 'Admin',
       joiningDate: new Date('2020-01-01'),
-      programDuration: '2 years',
+      probationPeriod: '6 months',
+      program: 'Admin Program',
       role: adminRole,
       department: department,
-    });
+    };
 
-    // Save the new admin user
-    await this.userRepository.save(newAdmin);
+    const userEntity = this.userRepository.create(newAdmin);
+    await this.userRepository.save(userEntity);
+
     console.log('Admin user created!');
   }
 }

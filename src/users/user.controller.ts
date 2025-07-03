@@ -8,36 +8,37 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service'; // Corrected the import for UserService
+import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { RoleGuard } from '../guards/role.guard'; // Import the role guard
-import { SetMetadata } from '@nestjs/common'; // Corrected the import for SetMetadata
-
+import { RoleGuard } from '../guards/role.guard';
+import { JwtGuard } from '../guards/jwt.guard';
+import { Roles } from '../roles/role.decorator';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {} // Added constructor to inject userService
 
   // Create user
   @Post()
-  @SetMetadata('roles', ['admin']) // Only users with 'admin' role can access this route
-  @UseGuards(RoleGuard)
+  // Only users with 'admin' role can access this route
+  @Roles('admin')
+  @UseGuards(JwtGuard, RoleGuard)
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
   }
 
   // Get all users
   @Get()
-  @SetMetadata('roles', ['admin']) // Only users with 'admin' role can access this route
-  @UseGuards(RoleGuard)
+  @Roles('admin')
+  @UseGuards(JwtGuard, RoleGuard) // Only users with 'admin' role can access this route
   getUsers() {
-    return this.userService.getUsers(); // Corrected the typo: userServic -> userService
+    return this.userService.getUsers();
   }
 
   // Update user by ID
   @Put(':id')
-  @SetMetadata('roles', ['admin']) // Only users with 'admin' role can access this route
-  @UseGuards(RoleGuard)
+  @Roles('admin')
+  @UseGuards(JwtGuard, RoleGuard)
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -47,8 +48,8 @@ export class UserController {
 
   // Delete user by ID
   @Delete(':id')
-  @SetMetadata('roles', ['admin']) // Only users with 'admin' role can access this route
-  @UseGuards(RoleGuard)
+  @Roles('admin')
+  @UseGuards(JwtGuard, RoleGuard)
   async deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
   }

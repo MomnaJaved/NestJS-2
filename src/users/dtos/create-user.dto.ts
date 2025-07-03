@@ -59,34 +59,34 @@ export class CreateUserDto {
 
   @IsDate()
   @IsOptional()
-  joiningDate?: Date; // Optional for students
+  joiningDate?: Date;
 
   @IsString()
   @MaxLength(16)
   @IsOptional()
-  probationPeriod?: string; // Optional for students
+  probationPeriod?: string;
 
   @IsUUID()
   @IsOptional()
-  lineManagerID?: string; // Optional for students
+  lineManagerID?: string;
 
   @IsString()
   @MaxLength(32)
   @IsOptional()
-  program?: string; // Optional for faculty
+  program?: string;
 
   @IsDate()
   @IsOptional()
-  admissionDate?: Date; // Optional for faculty
+  admissionDate?: Date;
 
   @IsString()
   @MaxLength(16)
   @IsOptional()
-  programDuration?: string; // Optional for faculty
+  programDuration?: string;
 
   @IsInt()
-  roleId: number;
+  roleId: number; // This should be an integer (foreign key to Role)
 
-  @IsInt()
-  departmentId: string;
+  @IsUUID()
+  departmentId: string; // Department foreign key
 }
