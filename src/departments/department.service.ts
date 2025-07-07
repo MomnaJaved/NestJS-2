@@ -34,10 +34,4 @@ export class DepartmentService {
     }
     return department;
   }
-
-  public async findDepartmentById(id: string): Promise<Department | null> {
-    return this.departmentRepository.findOne({
-      where: { id },
-    });
-  }
 }

@@ -13,14 +13,13 @@ import { DepartmentModule } from './departments/department.module';
 import { UserModule } from './users/user.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
+import { SubjectsModule } from './subjects/subjects.module';
+import { Subject } from './subjects/subjects.entity';
+import { AttendanceRecord } from './attendance/attendance_record.entity';
+import { StudentSubjects } from './subjects/student_subjects.entity';
 
 @Module({
   imports: [
-    RoleModule,
-    DepartmentModule,
-    UserModule,
-    AuthModule,
-    AttendanceModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -29,13 +28,26 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'Momna292003.',
       database: process.env.DB_DATABASE || 'Attendance',
-      entities: [Role, User, Department, Attendance],
+      entities: [
+        Role,
+        User,
+        Department,
+        Attendance,
+        Subject,
+        AttendanceRecord,
+        StudentSubjects,
+      ],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Role, Department, Attendance]),
+    RoleModule,
+    DepartmentModule,
+    UserModule,
+    AuthModule,
+    SubjectsModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService, AdminSeed],
-  exports: [AdminSeed], // Optional: useful if used in another module
+  exports: [AdminSeed],
 })
 export class AppModule {}

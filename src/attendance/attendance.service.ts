@@ -1,50 +1,41 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Attendance } from './attendance.entity';
-import { CreateAttendanceDto } from './dtos/create-attendance.dto';
 import { User } from '../users/user.entity';
-import { Department } from '../departments/department.entity';
+import { AttendanceRecord } from './attendance_record.entity';
+import { Subject } from '../subjects/subjects.entity';
 
 @Injectable()
 export class AttendanceService {
+  getAttendanceForSubject() {
+    throw new Error('Method not implemented.');
+  }
   constructor(
-    @InjectRepository(Attendance)
-    private readonly attendanceRepository: Repository<Attendance>,
+    @InjectRepository(AttendanceRecord)
+    private readonly attendanceRepository: Repository<AttendanceRecord>, // Inject AttendanceRecord repository
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Department)
-    private readonly departmentRepository: Repository<Department>,
+    @InjectRepository(Subject)
+    private readonly subjectRepository: Repository<Subject>,
   ) {}
 
-  // Create new attendance entry
-  async createAttendance(createAttendanceDto: CreateAttendanceDto) {
-    const user = await this.userRepository.findOne({
-      where: { id: createAttendanceDto.userId },
-    });
-    if (!user) {
-      throw new NotFoundException(
-        `User with id ${createAttendanceDto.userId} not found`,
-      );
-    }
+  // Mark attendance for students in a subject
+  async markAttendance(
+    subjectId: number,
+    studentIds: string[],
+    status: boolean,
+  ) {
+    const date = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
-    const department = await this.departmentRepository.findOne({
-      where: { id: createAttendanceDto.departmentId },
-    });
-    if (!department) {
-      throw new NotFoundException(
-        `Department with id ${createAttendanceDto.departmentId} not found`,
-      );
-    }
+    // Map studentIds to create attendance records
+    const records = studentIds.map((studentId) => ({
+      student: { id: studentId }, // Reference to the student using their ID
+      subject: { id: subjectId }, // Reference to the subject using its ID
+      date,
+      status,
+    }));
 
-    const attendance = this.attendanceRepository.create(createAttendanceDto);
-    return await this.attendanceRepository.save(attendance);
-  }
-
-  // Get all attendance records
-  async getAttendance() {
-    return this.attendanceRepository.find({
-      relations: ['user', 'department'], // Ensure user and department relations are loaded
-    });
+    // Save attendance records
+    return this.attendanceRepository.save(records);
   }
 }

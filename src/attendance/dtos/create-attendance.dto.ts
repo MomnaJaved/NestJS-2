@@ -1,15 +1,13 @@
-import { IsUUID, IsBoolean, IsDate } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsString } from 'class-validator';
 
 export class CreateAttendanceDto {
-  @IsUUID()
-  userId: string;
+  @IsInt()
+  subjectId: number; // ID of the subject for which attendance is being marked
 
-  @IsUUID()
-  departmentId: string;
-
-  @IsDate()
-  date: Date; // The date of the attendance
+  @IsArray()
+  @IsString({ each: true })
+  studentIds: string[]; // Array of student IDs whose attendance is being marked
 
   @IsBoolean()
-  status: boolean; // Present or Absent
+  status: boolean; // Status of attendance (true for present, false for absent)
 }

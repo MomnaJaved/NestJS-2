@@ -5,10 +5,24 @@ import { AttendanceController } from './attendance.controller';
 import { AttendanceService } from './attendance.service';
 import { User } from '../users/user.entity';
 import { Department } from '../departments/department.entity';
+import { Subject } from '../subjects/subjects.entity';
+import { AttendanceRecord } from './attendance_record.entity';
+import { JwtGuard } from '../guards/jwt.guard';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Attendance, User, Department])],
+  imports: [
+    AuthModule,
+    TypeOrmModule.forFeature([
+      Attendance,
+      User,
+      Department,
+      Subject,
+      AttendanceRecord,
+    ]),
+  ],
   controllers: [AttendanceController],
-  providers: [AttendanceService],
+  providers: [AttendanceService, JwtGuard],
+  exports: [TypeOrmModule],
 })
 export class AttendanceModule {}

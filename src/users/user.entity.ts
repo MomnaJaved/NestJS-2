@@ -1,6 +1,7 @@
 import { Attendance } from '../attendance/attendance.entity';
+import { AttendanceRecord } from '../attendance/attendance_record.entity';
 import { Department } from '../departments/department.entity';
-import { Role } from 'src/roles/role.entity';
+import { Role } from '../roles/role.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,6 +11,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+import { StudentSubjects } from '../subjects/student_subjects.entity';
 
 @Entity()
 export class User {
@@ -84,6 +86,9 @@ export class User {
   @Column({ type: 'varchar', length: 16, nullable: true })
   programDuration: string;
 
-  @OneToMany(() => Attendance, (attendance) => attendance.user)
-  attendances: Attendance[];
+  @OneToMany(() => Attendance, (attendances) => attendances.user)
+  attendanceRecords: AttendanceRecord[];
+
+  @OneToMany(() => StudentSubjects, (ss) => ss.user)
+  studentSubjects: StudentSubjects[];
 }

@@ -32,7 +32,7 @@ export class AdminSeed {
 
     // Check if admin user already exists
     const existingAdmin = await this.userRepository.findOne({
-      where: { email: 'javediqbal@gmail.com' }, // Change this to your desired email
+      where: { email: 'javediqbal@gmail.com' },
     });
 
     if (existingAdmin) {

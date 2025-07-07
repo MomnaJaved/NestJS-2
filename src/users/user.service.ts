@@ -45,7 +45,7 @@ export class UserService {
     }
 
     // Fetch the department by departmentId
-    const department = await this.departmentService.findDepartmentById(
+    const department = await this.departmentService.getDepartmentById(
       createUserDto.departmentId,
     );
     if (!department) {
@@ -92,7 +92,7 @@ export class UserService {
 
     // If provided, update the department
     if (updateUserDto.departmentId) {
-      const department = await this.departmentService.findDepartmentById(
+      const department = await this.departmentService.getDepartmentById(
         updateUserDto.departmentId,
       );
       if (!department) {
