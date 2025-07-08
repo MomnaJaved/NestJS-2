@@ -11,8 +11,8 @@ export class AttendanceController {
 
   // Mark attendance for students
   @Post('mark') // Endpoint for marking attendance
+  @Roles('Faculty') // Only users with the 'faculty' role can access this route
   @UseGuards(JwtGuard, RoleGuard) // Protect the route with JWT authentication and role-based authorization
-  @Roles('faculty') // Only users with the 'faculty' role can access this route
   async markAttendance(@Body() createAttendanceDto: CreateAttendanceDto) {
     const { subjectId, studentIds, status } = createAttendanceDto; // Destructure the data from the request body
     return this.attendanceService.markAttendance(subjectId, studentIds, status); // Call the service to mark the attendance

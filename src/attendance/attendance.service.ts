@@ -2,40 +2,53 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
-import { AttendanceRecord } from './attendance_record.entity';
 import { Subject } from '../subjects/subjects.entity';
+import { Attendance } from './attendance.entity';
+import { AttendanceRecord } from './attendance_record.entity';
 
 @Injectable()
 export class AttendanceService {
-  getAttendanceForSubject() {
-    throw new Error('Method not implemented.');
-  }
   constructor(
+    @InjectRepository(Attendance)
+    private readonly attendanceRepo: Repository<Attendance>,
+
     @InjectRepository(AttendanceRecord)
-    private readonly attendanceRepository: Repository<AttendanceRecord>, // Inject AttendanceRecord repository
+    private readonly attendanceRecordRepo: Repository<AttendanceRecord>,
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
     @InjectRepository(Subject)
     private readonly subjectRepository: Repository<Subject>,
   ) {}
 
-  // Mark attendance for students in a subject
   async markAttendance(
     subjectId: number,
     studentIds: string[],
     status: boolean,
   ) {
-    const date = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    const date = new Date();
 
-    // Map studentIds to create attendance records
-    const records = studentIds.map((studentId) => ({
-      student: { id: studentId }, // Reference to the student using their ID
-      subject: { id: subjectId }, // Reference to the subject using its ID
+    const subject = await this.subjectRepository.findOneBy({ id: subjectId });
+    if (!subject) throw new Error('Subject not found');
+
+    // Step 1: Create attendance record for today & subject
+    const attendanceRecord = this.attendanceRecordRepo.create({
       date,
       status,
-    }));
+      subject,
+    });
+    const savedRecord = await this.attendanceRecordRepo.save(attendanceRecord);
 
-    // Save attendance records
-    return this.attendanceRepository.save(records);
+    // Step 2: Create individual attendance entries for each student
+    const attendances = studentIds.map((studentId) =>
+      this.attendanceRepo.create({
+        user: { id: studentId },
+        subjectName: subject.name,
+        attendanceRecord: savedRecord,
+      }),
+    );
+
+    return await this.attendanceRepo.save(attendances);
   }
 }
