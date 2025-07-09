@@ -9,6 +9,7 @@ import { Subject } from '../subjects/subjects.entity';
 import { AttendanceRecord } from './attendance_record.entity';
 import { JwtGuard } from '../guards/jwt.guard';
 import { AuthModule } from '../auth/auth.module';
+import { StudentSubject } from '../subjects/student_subjects.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from '../auth/auth.module';
       Department,
       Subject,
       AttendanceRecord,
+      StudentSubject,
     ]),
   ],
   controllers: [AttendanceController],

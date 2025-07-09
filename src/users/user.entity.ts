@@ -1,4 +1,3 @@
-import { Attendance } from '../attendance/attendance.entity';
 import { AttendanceRecord } from '../attendance/attendance_record.entity';
 import { Department } from '../departments/department.entity';
 import { Role } from '../roles/role.entity';
@@ -11,7 +10,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { StudentSubjects } from '../subjects/student_subjects.entity';
+import { StudentSubject } from '../subjects/student_subjects.entity';
 
 @Entity()
 export class User {
@@ -71,7 +70,7 @@ export class User {
 
   @ManyToOne(() => Role)
   @JoinColumn({ name: 'roleId', referencedColumnName: 'id' })
-  role: Role; // Corrected to refer directly to Role entity
+  role: Role;
 
   @ManyToOne(() => Department)
   @JoinColumn({ name: 'departmentId', referencedColumnName: 'id' })
@@ -86,9 +85,9 @@ export class User {
   @Column({ type: 'varchar', length: 16, nullable: true })
   programDuration: string;
 
-  @OneToMany(() => Attendance, (attendances) => attendances.user)
-  attendanceRecords: AttendanceRecord[];
+  @OneToMany(() => StudentSubject, (ss) => ss.student)
+  studentSubjects: StudentSubject[];
 
-  @OneToMany(() => StudentSubjects, (ss) => ss.user)
-  studentSubjects: StudentSubjects[];
+  @OneToMany(() => AttendanceRecord, (record) => record.student)
+  attendanceRecords: AttendanceRecord[];
 }

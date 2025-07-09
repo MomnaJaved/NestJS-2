@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from './role.entity';
 import { CreateRoleDto } from './dtos/create-role.dto';
+import { UpdateRoleDto } from './dtos/update-role.dto';
 
 @Injectable()
 export class RoleService {
@@ -39,5 +40,16 @@ export class RoleService {
     return this.roleRepository.findOne({
       where: { id: roleId }, // Specify the query structure correctly
     });
+  }
+  async updateRole(id: number, dto: UpdateRoleDto): Promise<Role> {
+    const role = await this.findRoleById(id);
+    Object.assign(role!, dto);
+    return this.roleRepository.save(role!);
+  }
+
+  async deleteRole(id: number): Promise<{ message: string }> {
+    const role = await this.findRoleById(id);
+    await this.roleRepository.remove(role!);
+    return { message: `Role '${role!.name}' deleted successfully` };
   }
 }

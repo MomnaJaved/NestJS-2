@@ -1,7 +1,7 @@
-// subject.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Attendance } from '../attendance/attendance.entity';
+import { StudentSubject } from './student_subjects.entity';
 import { AttendanceRecord } from '../attendance/attendance_record.entity';
-import { StudentSubjects } from './student_subjects.entity';
 
 @Entity()
 export class Subject {
@@ -11,15 +11,12 @@ export class Subject {
   @Column()
   name: string;
 
-  @Column()
-  description: string;
+  @OneToMany(() => Attendance, (attendance) => attendance.subject)
+  attendances: Attendance[];
 
-  @OneToMany(
-    () => AttendanceRecord,
-    (attendanceRecord) => attendanceRecord.subject,
-  )
+  @OneToMany(() => StudentSubject, (ss) => ss.subject)
+  studentSubjects: StudentSubject[];
+
+  @OneToMany(() => AttendanceRecord, (record) => record.subject)
   attendanceRecords: AttendanceRecord[];
-
-  @OneToMany(() => StudentSubjects, (ss) => ss.subject)
-  studentSubjects: StudentSubjects[];
 }

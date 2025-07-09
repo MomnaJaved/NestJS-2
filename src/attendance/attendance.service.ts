@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Subject } from '../subjects/subjects.entity';
 import { Attendance } from './attendance.entity';
 import { AttendanceRecord } from './attendance_record.entity';
+import { Repository } from 'typeorm';
+import { StudentSubject } from '../subjects/student_subjects.entity';
+import { User } from '../users/user.entity';
+import { Subject } from '../subjects/subjects.entity';
 
 @Injectable()
 export class AttendanceService {
@@ -15,40 +16,153 @@ export class AttendanceService {
     @InjectRepository(AttendanceRecord)
     private readonly attendanceRecordRepo: Repository<AttendanceRecord>,
 
+    @InjectRepository(StudentSubject)
+    private readonly studentSubjectRepo: Repository<StudentSubject>,
+
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userRepo: Repository<User>,
 
     @InjectRepository(Subject)
-    private readonly subjectRepository: Repository<Subject>,
+    private readonly subjectRepo: Repository<Subject>,
   ) {}
 
   async markAttendance(
+    studentId: string,
     subjectId: number,
-    studentIds: string[],
-    status: boolean,
+    status: 'present' | 'absent',
   ) {
-    const date = new Date();
+    const studentSubject = await this.studentSubjectRepo.findOne({
+      where: {
+        student: { id: studentId },
+        subject: { id: subjectId },
+      },
+    });
 
-    const subject = await this.subjectRepository.findOneBy({ id: subjectId });
-    if (!subject) throw new Error('Subject not found');
+    if (!studentSubject) {
+      throw new NotFoundException('Student not registered in this subject');
+    }
 
-    // Step 1: Create attendance record for today & subject
-    const attendanceRecord = this.attendanceRecordRepo.create({
-      date,
-      status,
+    const subject = await this.subjectRepo.findOne({
+      where: { id: subjectId },
+    });
+    if (!subject) throw new NotFoundException('Subject not found');
+
+    const attendance = await this.attendanceRepo.save({
+      date: new Date().toISOString().slice(0, 10), // format to yyyy-mm-dd
       subject,
     });
-    const savedRecord = await this.attendanceRecordRepo.save(attendanceRecord);
 
-    // Step 2: Create individual attendance entries for each student
-    const attendances = studentIds.map((studentId) =>
-      this.attendanceRepo.create({
-        user: { id: studentId },
-        subjectName: subject.name,
-        attendanceRecord: savedRecord,
-      }),
-    );
+    const student = await this.userRepo.findOne({ where: { id: studentId } });
+    if (!student) throw new NotFoundException('Student not found');
 
-    return await this.attendanceRepo.save(attendances);
+    const attendanceRecord = this.attendanceRecordRepo.create({
+      attendance,
+      student,
+      subject,
+      status,
+      date: new Date().toISOString().slice(0, 10),
+    });
+
+    return await this.attendanceRecordRepo.save(attendanceRecord);
+  }
+
+  async getStudentAttendanceDetails(studentId: string) {
+    const records = await this.attendanceRecordRepo.find({
+      where: { student: { id: studentId } },
+      relations: ['attendance', 'subject'],
+      order: { attendance: { date: 'ASC' } },
+    });
+
+    // Group records by subject
+    const grouped: Record<string, { subject: string; attendance: any[] }> = {};
+
+    for (const rec of records) {
+      const subjectName = rec.subject.name;
+
+      if (!grouped[subjectName]) {
+        grouped[subjectName] = {
+          subject: subjectName,
+          attendance: [],
+        };
+      }
+
+      grouped[subjectName].attendance.push({
+        date: rec.attendance.date,
+        status: rec.status,
+      });
+    }
+
+    return {
+      studentId,
+      subjects: Object.values(grouped),
+    };
+  }
+
+  async viewAllAttendance(subjectId: number) {
+    const records = await this.attendanceRecordRepo.find({
+      where: { subject: { id: subjectId } },
+      relations: ['attendance', 'subject', 'student'],
+      order: { attendance: { date: 'ASC' } },
+    });
+
+    // Group by student
+    const grouped: Record<
+      string,
+      { studentId: string; studentName: string; attendance: any[] }
+    > = {};
+
+    for (const rec of records) {
+      const studentId = rec.student.id;
+      const studentName = `${rec.student.firstName} ${rec.student.lastName}`;
+
+      if (!grouped[studentId]) {
+        grouped[studentId] = {
+          studentId,
+          studentName,
+          attendance: [],
+        };
+      }
+
+      grouped[studentId].attendance.push({
+        date: rec.attendance.date,
+        status: rec.status,
+      });
+    }
+
+    return {
+      subjectId,
+      subjectName: records[0]?.subject?.name || 'Unknown',
+      students: Object.values(grouped),
+    };
+  }
+  // Get attendance record by id
+  async getAttendanceRecordById(id: number) {
+    const record = await this.attendanceRecordRepo.findOne({
+      where: { id },
+      relations: ['attendance', 'subject', 'student'],
+    });
+    if (!record) {
+      throw new NotFoundException(`Attendance record with ID ${id} not found`);
+    }
+    return record;
+  }
+  // Update attendance record status
+  async updateAttendance(id: number, status: 'present' | 'absent') {
+    const record = await this.attendanceRecordRepo.findOne({ where: { id } });
+    if (!record) {
+      throw new NotFoundException(`Attendance record with ID ${id} not found`);
+    }
+    record.status = status;
+    return this.attendanceRecordRepo.save(record);
+  }
+
+  // Delete attendance record
+  async deleteAttendance(id: number) {
+    const record = await this.attendanceRecordRepo.findOne({ where: { id } });
+    if (!record) {
+      throw new NotFoundException(`Attendance record with ID ${id} not found`);
+    }
+    await this.attendanceRecordRepo.remove(record);
+    return { message: `Attendance record with ID ${id} deleted successfully` };
   }
 }

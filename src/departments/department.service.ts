@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Department } from './department.entity';
 import { CreateDepartmentDto } from './dtos/create-department.dto';
+import { UpdateDepartmentDto } from './dtos/update-department.dto';
 
 @Injectable()
 export class DepartmentService {
@@ -33,5 +34,20 @@ export class DepartmentService {
       throw new NotFoundException(`Department with ID ${id} not found`);
     }
     return department;
+  }
+
+  async updateDepartment(
+    id: string,
+    updateDto: UpdateDepartmentDto,
+  ): Promise<Department> {
+    const department = await this.getDepartmentById(id);
+    Object.assign(department, updateDto);
+    return this.departmentRepository.save(department);
+  }
+
+  async deleteDepartment(id: string): Promise<{ message: string }> {
+    const department = await this.getDepartmentById(id);
+    await this.departmentRepository.remove(department);
+    return { message: `Department with ID ${id} deleted successfully` };
   }
 }

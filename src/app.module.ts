@@ -16,7 +16,9 @@ import { AuthModule } from './auth/auth.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { Subject } from './subjects/subjects.entity';
 import { AttendanceRecord } from './attendance/attendance_record.entity';
-import { StudentSubjects } from './subjects/student_subjects.entity';
+import { StudentSubject } from './subjects/student_subjects.entity';
+import { MiddlewareConsumer } from '@nestjs/common';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -35,7 +37,7 @@ import { StudentSubjects } from './subjects/student_subjects.entity';
         Attendance,
         Subject,
         AttendanceRecord,
-        StudentSubjects,
+        StudentSubject,
       ],
       synchronize: true,
     }),
@@ -50,4 +52,8 @@ import { StudentSubjects } from './subjects/student_subjects.entity';
   providers: [AppService, AdminSeed],
   exports: [AdminSeed],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

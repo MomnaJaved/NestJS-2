@@ -1,27 +1,27 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  ManyToOne,
-} from 'typeorm';
-import { Attendance } from './attendance.entity'; // Import the Attendance entity
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Attendance } from './attendance.entity';
+import { User } from '../users/user.entity';
 import { Subject } from '../subjects/subjects.entity';
 
 @Entity()
 export class AttendanceRecord {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ type: 'date' })
-  date: Date; // Date of the attendance record
+  @ManyToOne(() => Attendance, (attendance) => attendance.records, {
+    onDelete: 'CASCADE',
+  })
+  attendance: Attendance;
 
-  @Column({ type: 'boolean' })
-  status: boolean; // true for present, false for absent
-
-  @OneToMany(() => Attendance, (attendance) => attendance.attendanceRecord)
-  attendances: Attendance[]; // Link back to multiple attendance entries
+  @ManyToOne(() => User, (user) => user.attendanceRecords, { eager: true })
+  student: User;
 
   @ManyToOne(() => Subject, (subject) => subject.attendanceRecords)
   subject: Subject;
+
+  @Column({ type: 'varchar', default: 'absent' })
+  status: string;
+
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+  date: string;
 }
