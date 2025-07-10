@@ -24,7 +24,7 @@ export class SubjectsService {
     private readonly studentSubjectRepository: Repository<StudentSubject>,
 
     @InjectRepository(StudentFaculty)
-    private readonly studentFacultyRepository: Repository<StudentFaculty>, // ✅ fixed type
+    private readonly studentFacultyRepository: Repository<StudentFaculty>,
   ) {}
 
   async createSubject(name: string): Promise<Subject> {

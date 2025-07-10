@@ -12,7 +12,7 @@ import { StudentFaculty } from '../junctionTables/student_faculty.entity';
   imports: [
     TypeOrmModule.forFeature([Subject, User, StudentSubject, StudentFaculty]),
     JwtModule.register({
-      secret: 'mySuperSecretKey12345', // Add your JWT secret here, or use ConfigService for dynamic values
+      secret: 'mySuperSecretKey12345',
       signOptions: { expiresIn: '1h' },
     }),
   ],

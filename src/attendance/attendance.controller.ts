@@ -10,11 +10,11 @@ import {
   Put,
   ParseIntPipe,
 } from '@nestjs/common';
-import { AttendanceService } from './attendance.service'; // Import the AttendanceService
+import { AttendanceService } from './attendance.service';
 import { MarkAttendanceDto } from './dtos/mark-attendance.dto';
-import { JwtGuard } from '../guards/jwt.guard'; // Import the JwtGuard for authentication
-import { RoleGuard } from '../guards/role.guard'; // Import the RoleGuard for authorization (admin or faculty)
-import { Roles } from '../roles/role.decorator'; // Custom decorator to set roles
+import { JwtGuard } from '../guards/jwt.guard';
+import { RoleGuard } from '../guards/role.guard';
+import { Roles } from '../roles/role.decorator';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { RolesOrOwnerFacultyGuard } from '../guards/roles-owner.guard';
 import { FacultySubjectAccessGuard } from '../guards/faculty-subjects.guard';
@@ -24,6 +24,7 @@ export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @UseGuards(JwtGuard, RoleGuard, FacultyAssignedToSubjectGuard)
+  //only the faculty that is registered in the subject same as the student can mark its attendance
   @Post('mark')
   markAttendance(@Body() dto: MarkAttendanceDto) {
     return this.attendanceService.markAttendance(
