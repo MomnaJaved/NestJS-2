@@ -15,10 +15,11 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { Subject } from './subjects/subjects.entity';
-import { AttendanceRecord } from './attendance/attendance_record.entity';
-import { StudentSubject } from './subjects/student_subjects.entity';
+import { AttendanceRecord } from './junctionTables/attendance_record.entity';
+import { StudentSubject } from './junctionTables/student_subjects.entity';
 import { MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { StudentFaculty } from './junctionTables/student_faculty.entity';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
         Subject,
         AttendanceRecord,
         StudentSubject,
+        StudentFaculty,
       ],
       synchronize: true,
     }),

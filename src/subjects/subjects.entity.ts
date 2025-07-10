@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Attendance } from '../attendance/attendance.entity';
-import { StudentSubject } from './student_subjects.entity';
-import { AttendanceRecord } from '../attendance/attendance_record.entity';
+import { StudentSubject } from '../junctionTables/student_subjects.entity';
+import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
 
 @Entity()
 export class Subject {

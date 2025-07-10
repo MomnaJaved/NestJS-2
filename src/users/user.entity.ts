@@ -1,4 +1,4 @@
-import { AttendanceRecord } from '../attendance/attendance_record.entity';
+import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
 import { Department } from '../departments/department.entity';
 import { Role } from '../roles/role.entity';
 import {
@@ -10,8 +10,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { StudentSubject } from '../subjects/student_subjects.entity';
-
+import { StudentSubject } from '../junctionTables/student_subjects.entity';
+import { StudentFaculty } from '../junctionTables/student_faculty.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -90,4 +90,10 @@ export class User {
 
   @OneToMany(() => AttendanceRecord, (record) => record.student)
   attendanceRecords: AttendanceRecord[];
+
+  @OneToMany(() => StudentFaculty, (sf) => sf.student)
+  studentFacultyLinks: StudentFaculty[];
+
+  @OneToMany(() => StudentFaculty, (sf) => sf.faculty)
+  facultyStudentLinks: StudentFaculty[];
 }

@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendance } from './attendance.entity';
-import { AttendanceRecord } from './attendance_record.entity';
+import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
 import { Repository } from 'typeorm';
-import { StudentSubject } from '../subjects/student_subjects.entity';
+import { StudentSubject } from '../junctionTables/student_subjects.entity';
 import { User } from '../users/user.entity';
 import { Subject } from '../subjects/subjects.entity';
 

@@ -26,10 +26,15 @@ export class SubjectsController {
   @Roles('Student', 'admin')
   @UseGuards(JwtGuard, RoleGuard)
   async registerStudentToSubject(@Body() dto: RegisterSubjectDto) {
-    return this.subjectsService.registerStudentToSubject(
+    const registration = await this.subjectsService.registerStudentToSubject(
       dto.studentId,
       dto.subjectId,
     );
+
+    // Update faculty-student relations after registration
+    await this.subjectsService.updateStudentFacultyRelations(dto.subjectId);
+
+    return registration;
   }
 
   @Post()
@@ -68,5 +73,14 @@ export class SubjectsController {
     @Body() dto: UpdateSubjectDto,
   ): Promise<Subject> {
     return this.subjectsService.updateSubject(id, dto);
+  }
+
+  @Post(':id/update-relations')
+  @Roles('admin')
+  @UseGuards(JwtGuard, RoleGuard)
+  async updateFacultyStudentRelations(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    return this.subjectsService.updateStudentFacultyRelations(id);
   }
 }

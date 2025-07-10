@@ -6,7 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Subject } from '../subjects/subjects.entity';
-import { AttendanceRecord } from './attendance_record.entity';
+import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
 
 @Entity()
 export class Attendance {
