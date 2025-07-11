@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   UseGuards,
-  UseInterceptors,
   Delete,
   Put,
   ParseIntPipe,
@@ -15,10 +14,9 @@ import { MarkAttendanceDto } from './dtos/mark-attendance.dto';
 import { JwtGuard } from '../guards/jwt.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { Roles } from '../roles/role.decorator';
-import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { RolesOrOwnerFacultyGuard } from '../guards/roles-owner.guard';
 import { FacultySubjectAccessGuard } from '../guards/faculty-subjects.guard';
-import { FacultyAssignedToSubjectGuard } from '../guards/faculty-subject.guard';
+import { FacultyAssignedToSubjectGuard } from '../guards/facultyAssignedtoSubject.guard';
 @Controller('attendance')
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
@@ -34,7 +32,6 @@ export class AttendanceController {
     );
   }
 
-  @UseInterceptors(LoggingInterceptor)
   @Get('student/:studentId')
   //only the student himself should be able to view his attendance, faculty and admin can also view it.
   @UseGuards(JwtGuard, RolesOrOwnerFacultyGuard)

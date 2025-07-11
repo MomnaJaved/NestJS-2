@@ -56,6 +56,6 @@ import { StudentFaculty } from './junctionTables/student_faculty.entity';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('attendance');
   }
 }
