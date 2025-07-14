@@ -27,16 +27,16 @@ export class SubjectsService {
     private readonly studentFacultyRepository: Repository<StudentFaculty>,
   ) {}
 
-  async createSubject(name: string): Promise<Subject> {
+  async createSubject(name: string) {
     const newSubject = this.subjectRepository.create({ name });
     return await this.subjectRepository.save(newSubject);
   }
 
-  async findAll(): Promise<Subject[]> {
+  async findAll() {
     return await this.subjectRepository.find();
   }
 
-  async findById(id: number): Promise<Subject> {
+  async findById(id: number) {
     const subject = await this.subjectRepository.findOne({ where: { id } });
     if (!subject) {
       throw new NotFoundException(`Subject with ID ${id} not found`);
@@ -44,23 +44,20 @@ export class SubjectsService {
     return subject;
   }
 
-  async deleteSubject(id: number): Promise<void> {
+  async deleteSubject(id: number) {
     const deleteResult = await this.subjectRepository.delete(id);
     if (deleteResult.affected === 0) {
       throw new NotFoundException(`Subject with ID ${id} not found`);
     }
   }
 
-  async updateSubject(id: number, dto: UpdateSubjectDto): Promise<Subject> {
+  async updateSubject(id: number, dto: UpdateSubjectDto) {
     const subject = await this.findById(id);
     Object.assign(subject, dto);
     return this.subjectRepository.save(subject);
   }
 
-  async registerStudentToSubject(
-    studentId: string,
-    subjectId: number,
-  ): Promise<StudentSubject> {
+  async registerStudentToSubject(studentId: string, subjectId: number) {
     const student = await this.userRepository.findOne({
       where: { id: studentId },
     });
@@ -97,7 +94,7 @@ export class SubjectsService {
     return await this.studentSubjectRepository.save(studentSubject);
   }
 
-  async updateStudentFacultyRelations(subjectId: number): Promise<void> {
+  async updateStudentFacultyRelations(subjectId: number) {
     const userSubjects = await this.studentSubjectRepository.find({
       where: { subject: { id: subjectId } },
       relations: ['student'],

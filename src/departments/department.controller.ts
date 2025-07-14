@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dtos/create-department.dto';
-import { Department } from './department.entity';
 import { Roles } from '../roles/role.decorator';
 import { JwtGuard } from '../guards/jwt.guard';
 import { RoleGuard } from '../guards/role.guard';
@@ -23,21 +22,19 @@ export class DepartmentController {
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
   @Post('createDepartment')
-  async createDepartment(
-    @Body() createDepartmentDto: CreateDepartmentDto,
-  ): Promise<Department> {
+  async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
     return this.departmentService.createDepartment(createDepartmentDto);
   }
 
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
   @Get('viewDepartments')
-  async getAllDepartments(): Promise<Department[]> {
+  async getAllDepartments() {
     return this.departmentService.getAllDepartments();
   }
 
   @Get('viewDepartment/:id')
-  async getDepartmentById(@Param('id') id: string): Promise<Department> {
+  async getDepartmentById(@Param('id') id: string) {
     return this.departmentService.getDepartmentById(id);
   }
 
@@ -47,16 +44,14 @@ export class DepartmentController {
   async updateDepartment(
     @Param('id') id: string,
     @Body() updateDto: UpdateDepartmentDto,
-  ): Promise<Department> {
+  ) {
     return this.departmentService.updateDepartment(id, updateDto);
   }
 
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
   @Delete('delete/:id')
-  async deleteDepartment(
-    @Param('id') id: string,
-  ): Promise<{ message: string }> {
+  async deleteDepartment(@Param('id') id: string) {
     return this.departmentService.deleteDepartment(id);
   }
 }

@@ -85,8 +85,8 @@ export class CreateUserDto {
   programDuration?: string;
 
   @IsInt()
-  roleId: number; // This should be an integer (foreign key to Role)
+  roleId: number;
 
   @IsUUID()
-  departmentId: string; // Department foreign key
+  departmentId: string;
 }

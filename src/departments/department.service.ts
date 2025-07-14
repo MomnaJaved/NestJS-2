@@ -13,20 +13,18 @@ export class DepartmentService {
   ) {}
 
   // Create department
-  async createDepartment(
-    createDepartmentDto: CreateDepartmentDto,
-  ): Promise<Department> {
+  async createDepartment(createDepartmentDto: CreateDepartmentDto) {
     const department = this.departmentRepository.create(createDepartmentDto);
     return this.departmentRepository.save(department);
   }
 
   // Get all departments
-  async getAllDepartments(): Promise<Department[]> {
+  async getAllDepartments() {
     return this.departmentRepository.find();
   }
 
   // Get department by ID
-  async getDepartmentById(id: string): Promise<Department> {
+  async getDepartmentById(id: string) {
     const department = await this.departmentRepository.findOne({
       where: { id },
     });
@@ -36,16 +34,13 @@ export class DepartmentService {
     return department;
   }
 
-  async updateDepartment(
-    id: string,
-    updateDto: UpdateDepartmentDto,
-  ): Promise<Department> {
+  async updateDepartment(id: string, updateDto: UpdateDepartmentDto) {
     const department = await this.getDepartmentById(id);
     Object.assign(department, updateDto);
     return this.departmentRepository.save(department);
   }
 
-  async deleteDepartment(id: string): Promise<{ message: string }> {
+  async deleteDepartment(id: string) {
     const department = await this.getDepartmentById(id);
     await this.departmentRepository.remove(department);
     return { message: `Department with ID ${id} deleted successfully` };
