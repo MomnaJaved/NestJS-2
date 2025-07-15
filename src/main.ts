@@ -6,9 +6,26 @@ import { AllExceptionsFilter } from './exception_filters/all-exception-filters';
 import { ErrorLoggingInterceptor } from './interceptors/error-logging.interceptor';
 import { ResponseTimeInterceptor } from './interceptors/response-time.interceptor';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Set up Swagger
+  const options = new DocumentBuilder()
+    .setTitle('Attendance Management System API')
+    .setDescription('API documentation for Attendance Management System')
+    .setVersion('1.0.0')
+    .addTag('attendance')
+    .addBearerAuth() // This enables JWT Bearer authentication in Swagger UI
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api-docs', app, document); // Swagger UI will be available at /api-docs
+
   await app.listen(3000);
+
+  // Global middlewares
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(

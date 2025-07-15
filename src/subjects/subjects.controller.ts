@@ -9,6 +9,14 @@ import {
   UseGuards,
   Patch,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger'; // Import Swagger decorators
 import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto } from './dtos/create-subject.dto';
 import { Subject } from './subjects.entity';
@@ -18,6 +26,7 @@ import { JwtGuard } from '../guards/jwt.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { UpdateSubjectDto } from './dtos/update-subject.dto';
 
+@ApiTags('subjects') // Tagging all routes in this controller under the 'subjects' category
 @Controller('subjects')
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
@@ -25,6 +34,14 @@ export class SubjectsController {
   @Post('register')
   @Roles('Student', 'admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Register a student to a subject' })
+  @ApiBody({ type: RegisterSubjectDto }) // Request body to register student
+  @ApiResponse({
+    status: 201,
+    description: 'Student registered to subject successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid student or subject ID.' })
   async registerStudentToSubject(@Body() dto: RegisterSubjectDto) {
     const registration = await this.subjectsService.registerStudentToSubject(
       dto.studentId,
@@ -40,6 +57,11 @@ export class SubjectsController {
   @Post()
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new subject' })
+  @ApiBody({ type: CreateSubjectDto }) // Request body to create subject
+  @ApiResponse({ status: 201, description: 'Subject created successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid subject data.' })
   async create(@Body() dto: CreateSubjectDto): Promise<Subject> {
     return this.subjectsService.createSubject(dto.name);
   }
@@ -47,6 +69,9 @@ export class SubjectsController {
   @Get()
   @Roles('Student', 'admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all subjects' })
+  @ApiResponse({ status: 200, description: 'List of all subjects.' })
   async findAll(): Promise<Subject[]> {
     return this.subjectsService.findAll();
   }
@@ -54,6 +79,11 @@ export class SubjectsController {
   @Get(':id')
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get a subject by ID' })
+  @ApiParam({ name: 'id', description: 'Subject ID to find the subject' })
+  @ApiResponse({ status: 200, description: 'Subject details.' })
+  @ApiResponse({ status: 404, description: 'Subject not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Subject> {
     return this.subjectsService.findById(id);
   }
@@ -61,6 +91,11 @@ export class SubjectsController {
   @Delete(':id')
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a subject by ID' })
+  @ApiParam({ name: 'id', description: 'Subject ID to delete' })
+  @ApiResponse({ status: 200, description: 'Subject deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Subject not found.' })
   async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.subjectsService.deleteSubject(id);
   }
@@ -68,6 +103,12 @@ export class SubjectsController {
   @Patch(':id')
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a subject by ID' })
+  @ApiParam({ name: 'id', description: 'Subject ID to update' })
+  @ApiBody({ type: UpdateSubjectDto }) // Request body to update subject
+  @ApiResponse({ status: 200, description: 'Subject updated successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid subject data.' })
   async updateSubject(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateSubjectDto,
@@ -78,6 +119,17 @@ export class SubjectsController {
   @Post(':id/update-relations')
   @Roles('admin')
   @UseGuards(JwtGuard, RoleGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update faculty-student relations for a subject' })
+  @ApiParam({
+    name: 'id',
+    description: 'Subject ID to update faculty-student relations',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Faculty-student relations updated successfully.',
+  })
+  @ApiResponse({ status: 404, description: 'Subject not found.' })
   async updateFacultyStudentRelations(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {

@@ -148,21 +148,31 @@ export class AttendanceService {
   }
   // Update attendance record status
   async updateAttendance(id: number, status: 'present' | 'absent') {
+    // Find the record by ID
     const record = await this.attendanceRecordRepo.findOne({ where: { id } });
+
+    // Handle the case where the record is not found
     if (!record) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);
     }
+
+    // Update the status
     record.status = status;
+
+    // Save the updated record
     return this.attendanceRecordRepo.save(record);
   }
 
   // Delete attendance record
   async deleteAttendance(id: number) {
     const record = await this.attendanceRecordRepo.findOne({ where: { id } });
+
     if (!record) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);
     }
+
+    // Proceed to delete the record
     await this.attendanceRecordRepo.remove(record);
-    return { message: `Attendance record with ID ${id} deleted successfully` };
+    return { message: 'Attendance record deleted successfully.' };
   }
 }
