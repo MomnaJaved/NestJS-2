@@ -15,7 +15,7 @@ export class Attendance {
 
   @Column({ type: 'date', default: () => 'CURRENT_DATE' })
   date: string;
-
+  // Eager automatically loads the related Subject entity whenever an Attendance is fetched, no need to additionally define a relation.
   @ManyToOne(() => Subject, (subject) => subject.attendances, { eager: true })
   subject: Subject;
 

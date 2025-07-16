@@ -53,6 +53,8 @@ export class AdminSeed {
     }
 
     // Hash password using bcrypt
+    //10 means 10 salt rounds
+    //the higher the salt round the more secure the hash, but also slower.
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
     // Create admin user

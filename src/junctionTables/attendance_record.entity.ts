@@ -7,7 +7,7 @@ import { Subject } from '../subjects/subjects.entity';
 export class AttendanceRecord {
   @PrimaryGeneratedColumn()
   id: number;
-
+  //If the parent record (Attendance) is deleted, then all related child records (records) will be automatically deleted too.
   @ManyToOne(() => Attendance, (attendance) => attendance.records, {
     onDelete: 'CASCADE',
   })

@@ -19,7 +19,6 @@ import {
 } from '@nestjs/swagger'; // Import Swagger decorators
 import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto } from './dtos/create-subject.dto';
-import { Subject } from './subjects.entity';
 import { RegisterSubjectDto } from './dtos/register-subject.dto';
 import { Roles } from '../roles/role.decorator';
 import { JwtGuard } from '../guards/jwt.guard';
@@ -62,7 +61,7 @@ export class SubjectsController {
   @ApiBody({ type: CreateSubjectDto }) // Request body to create subject
   @ApiResponse({ status: 201, description: 'Subject created successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid subject data.' })
-  async create(@Body() dto: CreateSubjectDto): Promise<Subject> {
+  async create(@Body() dto: CreateSubjectDto) {
     return this.subjectsService.createSubject(dto.name);
   }
 
@@ -72,7 +71,7 @@ export class SubjectsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all subjects' })
   @ApiResponse({ status: 200, description: 'List of all subjects.' })
-  async findAll(): Promise<Subject[]> {
+  async findAll() {
     return this.subjectsService.findAll();
   }
 
@@ -84,7 +83,7 @@ export class SubjectsController {
   @ApiParam({ name: 'id', description: 'Subject ID to find the subject' })
   @ApiResponse({ status: 200, description: 'Subject details.' })
   @ApiResponse({ status: 404, description: 'Subject not found.' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Subject> {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.subjectsService.findById(id);
   }
 
@@ -96,7 +95,7 @@ export class SubjectsController {
   @ApiParam({ name: 'id', description: 'Subject ID to delete' })
   @ApiResponse({ status: 200, description: 'Subject deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Subject not found.' })
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async delete(@Param('id', ParseIntPipe) id: number) {
     return this.subjectsService.deleteSubject(id);
   }
 
@@ -112,7 +111,7 @@ export class SubjectsController {
   async updateSubject(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateSubjectDto,
-  ): Promise<Subject> {
+  ) {
     return this.subjectsService.updateSubject(id, dto);
   }
 
@@ -130,9 +129,7 @@ export class SubjectsController {
     description: 'Faculty-student relations updated successfully.',
   })
   @ApiResponse({ status: 404, description: 'Subject not found.' })
-  async updateFacultyStudentRelations(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<void> {
+  async updateFacultyStudentRelations(@Param('id', ParseIntPipe) id: number) {
     return this.subjectsService.updateStudentFacultyRelations(id);
   }
 }
