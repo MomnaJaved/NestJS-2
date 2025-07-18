@@ -5,7 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.entity';
 import { Role } from '../roles/role.entity';
 import { Department } from '../departments/department.entity';
-import { DeepPartial } from 'typeorm';
+import { getEnvVarOrThrow } from '../common/env.helper';
+import { ADMIN_ROLE_NAME, ADMIN_DEPARTMENT_NAME } from '../common/constants';
 @Injectable()
 export class AdminSeed {
   constructor(
@@ -17,71 +18,94 @@ export class AdminSeed {
     private readonly departmentRepository: Repository<Department>,
   ) {}
 
-  async run() {
-    // Check if the admin role exists, if not, create it
-    let adminRole = await this.roleRepository.findOne({
-      where: { name: 'admin' },
-    });
+  async run(): Promise<void> {
+    // Check/Create Role
+    let adminRole = await this.roleRepository
+      .createQueryBuilder('role')
+      .where('role.name = :name', { name: ADMIN_ROLE_NAME })
+      .getOne();
 
     if (!adminRole) {
-      adminRole = await this.roleRepository.save({
-        name: 'admin',
-        description: 'Administrator with full access',
+      const insertResult = await this.roleRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Role)
+        .values({
+          name: ADMIN_ROLE_NAME,
+          description: 'Administrator with full access',
+        })
+        .execute();
+
+      adminRole = await this.roleRepository.findOneBy({
+        id: insertResult.identifiers[0].id,
       });
     }
 
-    // Check if admin user already exists
+    if (!adminRole) throw new Error('Failed to create or retrieve admin role');
+
+    // Check for existing admin user
     const existingAdmin = await this.userRepository.findOne({
-      where: { email: 'javediqbal@gmail.com' },
+      where: { email: process.env.DEFAULT_ADMIN_EMAIL },
     });
 
     if (existingAdmin) {
-      console.log('Admin user already exists!');
+      console.log(' Admin user already exists!');
       return;
     }
 
-    // Check if department exists
-    let department = await this.departmentRepository.findOne({
-      where: { name: 'Administration' },
-    });
+    // Check/Create Department
+    let department = await this.departmentRepository
+      .createQueryBuilder('department')
+      .where('department.name = :name', { name: ADMIN_DEPARTMENT_NAME })
+      .getOne();
 
     if (!department) {
-      department = await this.departmentRepository.save({
-        name: 'Administration',
-        description: 'Admin Department',
+      const insertResult = await this.departmentRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Department)
+        .values({
+          name: ADMIN_DEPARTMENT_NAME,
+          description: 'Admin Department',
+        })
+        .execute();
+
+      department = await this.departmentRepository.findOneBy({
+        id: insertResult.identifiers[0].id,
       });
     }
 
-    // Hash password using bcrypt
-    //10 means 10 salt rounds
-    //the higher the salt round the more secure the hash, but also slower.
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    if (!department) throw new Error('Failed to create or retrieve department');
 
-    // Create admin user
+    const password = getEnvVarOrThrow('DEFAULT_ADMIN_PASSWORD');
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newAdmin: DeepPartial<User> = {
-      firstName: 'Javed',
-      lastName: 'Iqbal',
-      password: hashedPassword,
-      contact: '03123456789',
-      email: 'javediqbal@gmail.com',
-      status: true,
-      code: 'EMP001',
-      gender: 'Male',
-      DOB: new Date('1990-01-01'),
-      maritalStatus: 'Single',
-      CNIC: '1234567890123',
-      designation: 'Admin',
-      joiningDate: new Date('2020-01-01'),
-      probationPeriod: '6 months',
-      program: 'Admin Program',
-      role: adminRole,
-      department: department,
-    };
+    //Insert admin user
+    await this.userRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({
+        firstName: 'Javed',
+        lastName: 'Iqbal',
+        password: hashedPassword,
+        contact: '03123456789',
+        email: process.env.DEFAULT_ADMIN_EMAIL,
+        status: true,
+        code: 'EMP001',
+        gender: 'Male',
+        DOB: new Date('1990-01-01'),
+        maritalStatus: 'Single',
+        CNIC: '1234567890123',
+        designation: ADMIN_ROLE_NAME,
+        joiningDate: new Date('2020-01-01'),
+        probationPeriod: '6 months',
+        program: 'Admin Program',
+        role: { id: adminRole.id },
+        department: { id: department.id },
+      })
+      .execute();
 
-    const userEntity = this.userRepository.create(newAdmin);
-    await this.userRepository.save(userEntity);
-
-    console.log('Admin user created!');
+    console.log('Admin user created successfully!');
   }
 }

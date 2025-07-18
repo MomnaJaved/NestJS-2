@@ -1,11 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendance } from './attendance.entity';
-import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
-import { Repository } from 'typeorm';
-import { StudentSubject } from '../junctionTables/student_subjects.entity';
+import { AttendanceRecord } from '../middleTables/attendance_record.entity';
+import { Repository, InsertResult } from 'typeorm';
+import { StudentSubject } from '../middleTables/student_subjects.entity';
 import { User } from '../users/user.entity';
-import { Subject } from '../subjects/subjects.entity';
+import { AttendanceStatus } from '../common/attendance-status.enum';
+
+export interface AttendanceDetails {
+  studentId: string;
+  subjects: {
+    subject: string;
+    attendance: { date: Date; status: AttendanceStatus }[];
+  }[];
+}
+
+export interface AttendanceSummary {
+  subjectId: number;
+  subjectName: string;
+  students: {
+    studentId: string;
+    studentName: string;
+    attendance: { date: Date; status: AttendanceStatus }[];
+  }[];
+}
 
 @Injectable()
 export class AttendanceService {
@@ -21,60 +39,81 @@ export class AttendanceService {
 
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-
-    @InjectRepository(Subject)
-    private readonly subjectRepo: Repository<Subject>,
   ) {}
 
   async markAttendance(
     studentId: string,
     subjectId: number,
-    status: 'present' | 'absent',
-  ) {
-    const studentSubject = await this.studentSubjectRepo.findOne({
-      where: {
-        student: { id: studentId },
-        subject: { id: subjectId },
-      },
-    });
+    status: AttendanceStatus,
+  ): Promise<{ message: string }> {
+    // Check if student is registered in the subject
+    const registeredCount = await this.studentSubjectRepo
+      .createQueryBuilder('ss')
+      .where('ss.studentId = :studentId', { studentId })
+      .andWhere('ss.subjectId = :subjectId', { subjectId })
+      .getCount();
 
-    if (!studentSubject) {
+    if (registeredCount === 0) {
       throw new NotFoundException('Student not registered in this subject');
     }
 
-    const subject = await this.subjectRepo.findOne({
-      where: { id: subjectId },
-    });
-    if (!subject) throw new NotFoundException('Subject not found');
+    // Verify student exists
+    const studentCount = await this.userRepo
+      .createQueryBuilder('user')
+      .where('user.id = :studentId', { studentId })
+      .getCount();
 
-    const attendance = await this.attendanceRepo.save({
-      date: new Date().toISOString().slice(0, 10), // format to yyyy-mm-dd
-      subject,
-    });
+    if (studentCount === 0) {
+      throw new NotFoundException('Student not found');
+    }
 
-    const student = await this.userRepo.findOne({ where: { id: studentId } });
-    if (!student) throw new NotFoundException('Student not found');
+    const date = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
 
-    const attendanceRecord = this.attendanceRecordRepo.create({
-      attendance,
-      student,
-      subject,
-      status,
-      date: new Date().toISOString().slice(0, 10),
-    });
+    // Insert attendance entry
+    const attendanceInsert: InsertResult = await this.attendanceRepo
+      .createQueryBuilder()
+      .insert()
+      .into(Attendance)
+      .values({ date, subject: { id: subjectId } })
+      .execute();
 
-    return await this.attendanceRecordRepo.save(attendanceRecord);
+    const attendanceId = attendanceInsert.identifiers[0].id;
+
+    // Insert attendance record
+    await this.attendanceRecordRepo
+      .createQueryBuilder()
+      .insert()
+      .into(AttendanceRecord)
+      .values({
+        date,
+        status,
+        student: { id: studentId },
+        subject: { id: subjectId },
+        attendance: { id: attendanceId },
+      })
+      .execute();
+
+    return { message: 'Attendance marked successfully' };
   }
 
-  async getStudentAttendanceDetails(studentId: string) {
-    const records = await this.attendanceRecordRepo.find({
-      where: { student: { id: studentId } },
-      relations: ['attendance', 'subject'],
-      order: { attendance: { date: 'ASC' } },
-    });
+  async getStudentAttendanceDetails(
+    studentId: string,
+  ): Promise<AttendanceDetails> {
+    const records = await this.attendanceRecordRepo
+      .createQueryBuilder('record')
+      .innerJoinAndSelect('record.attendance', 'attendance')
+      .innerJoinAndSelect('record.subject', 'subject')
+      .where('record.studentId = :studentId', { studentId })
+      .orderBy('attendance.date', 'ASC')
+      .getMany();
 
-    // Group records by subject
-    const grouped: Record<string, { subject: string; attendance: any[] }> = {};
+    const grouped: Record<
+      string,
+      {
+        subject: string;
+        attendance: { date: Date; status: AttendanceStatus }[];
+      }
+    > = {};
 
     for (const rec of records) {
       const subjectName = rec.subject.name;
@@ -87,7 +126,7 @@ export class AttendanceService {
       }
 
       grouped[subjectName].attendance.push({
-        date: rec.attendance.date,
+        date: new Date(rec.attendance.date),
         status: rec.status,
       });
     }
@@ -98,17 +137,23 @@ export class AttendanceService {
     };
   }
 
-  async viewAllAttendance(subjectId: number) {
-    const records = await this.attendanceRecordRepo.find({
-      where: { subject: { id: subjectId } },
-      relations: ['attendance', 'subject', 'student'],
-      order: { attendance: { date: 'ASC' } },
-    });
+  async viewAllAttendance(subjectId: number): Promise<AttendanceSummary> {
+    const records = await this.attendanceRecordRepo
+      .createQueryBuilder('record')
+      .innerJoinAndSelect('record.attendance', 'attendance')
+      .innerJoinAndSelect('record.subject', 'subject')
+      .innerJoinAndSelect('record.student', 'student')
+      .where('subject.id = :subjectId', { subjectId })
+      .orderBy('attendance.date', 'ASC')
+      .getMany();
 
-    // Group by student
     const grouped: Record<
       string,
-      { studentId: string; studentName: string; attendance: any[] }
+      {
+        studentId: string;
+        studentName: string;
+        attendance: { date: Date; status: AttendanceStatus }[];
+      }
     > = {};
 
     for (const rec of records) {
@@ -124,55 +169,63 @@ export class AttendanceService {
       }
 
       grouped[studentId].attendance.push({
-        date: rec.attendance.date,
+        date: new Date(rec.attendance.date),
         status: rec.status,
       });
     }
 
     return {
       subjectId,
-      subjectName: records[0]?.subject?.name || 'Unknown',
+      subjectName: records[0]?.subject?.name || '',
       students: Object.values(grouped),
     };
   }
-  // Get attendance record by id
-  async getAttendanceRecordById(id: number) {
-    const record = await this.attendanceRecordRepo.findOne({
-      where: { id },
-      relations: ['attendance', 'subject', 'student'],
-    });
+
+  async getAttendanceRecordById(id: number): Promise<AttendanceRecord> {
+    const record = await this.attendanceRecordRepo
+      .createQueryBuilder('record')
+      .innerJoinAndSelect('record.attendance', 'attendance')
+      .innerJoinAndSelect('record.subject', 'subject')
+      .innerJoinAndSelect('record.student', 'student')
+      .where('record.id = :id', { id })
+      .getOne();
+
     if (!record) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);
     }
+
     return record;
   }
-  // Update attendance record status
-  async updateAttendance(id: number, status: 'present' | 'absent') {
-    // Find the record by ID
-    const record = await this.attendanceRecordRepo.findOne({ where: { id } });
 
-    // Handle the case where the record is not found
-    if (!record) {
+  async updateAttendance(
+    id: number,
+    status: AttendanceStatus,
+  ): Promise<AttendanceRecord> {
+    const updateResult = await this.attendanceRecordRepo
+      .createQueryBuilder()
+      .update()
+      .set({ status })
+      .where('id = :id', { id })
+      .execute();
+
+    if (updateResult.affected === 0) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);
     }
 
-    // Update the status
-    record.status = status;
-
-    // Save the updated record
-    return this.attendanceRecordRepo.save(record);
+    return this.getAttendanceRecordById(id);
   }
 
-  // Delete attendance record
-  async deleteAttendance(id: number) {
-    const record = await this.attendanceRecordRepo.findOne({ where: { id } });
+  async deleteAttendance(id: number): Promise<{ message: string }> {
+    const deleteResult = await this.attendanceRecordRepo
+      .createQueryBuilder()
+      .delete()
+      .where('id = :id', { id })
+      .execute();
 
-    if (!record) {
+    if (deleteResult.affected === 0) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);
     }
 
-    // Proceed to delete the record
-    await this.attendanceRecordRepo.remove(record);
     return { message: 'Attendance record deleted successfully.' };
   }
 }

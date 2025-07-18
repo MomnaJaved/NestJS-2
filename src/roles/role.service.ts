@@ -1,4 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from './role.entity';
@@ -12,44 +16,85 @@ export class RoleService {
     private readonly roleRepository: Repository<Role>,
   ) {}
 
-  // Method to create a role
-  public async createRole(roleDto: CreateRoleDto) {
-    // Check if the role already exists by name
-    const existingRole = await this.roleRepository.findOne({
-      where: { name: roleDto.name },
-    });
+  // Create role using insert query builder
+  public async createRole(roleDto: CreateRoleDto): Promise<Role> {
+    const existingRole = await this.roleRepository
+      .createQueryBuilder('role')
+      .where('role.name = :name', { name: roleDto.name })
+      .getOne();
 
-    // If the role exists, throw a ConflictException
     if (existingRole) {
       throw new ConflictException('The role already exists');
     }
 
-    // If the role does not exist, create and save the new role
-    const newRole = this.roleRepository.create(roleDto);
-    return this.roleRepository.save(newRole);
+    const insertResult = await this.roleRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Role)
+      .values(roleDto)
+      .execute();
+
+    // insertResult.identifiers contains the inserted id(s)
+    const insertedId = insertResult.identifiers[0]?.id;
+    if (!insertedId) {
+      throw new ConflictException('Failed to insert role');
+    }
+
+    // Return the newly created role
+    return this.findRoleById(insertedId);
   }
 
-  // Method to get all roles
-  public getRoles() {
+  // Get all roles
+  public getRoles(): Promise<Role[]> {
     return this.roleRepository.find();
   }
 
-  // Fetch role by roleId, treating roleId as a number
-  async findRoleById(roleId: number): Promise<Role | null> {
-    // Use `where` to query based on `id`
-    return this.roleRepository.findOne({
-      where: { id: roleId }, // Specify the query structure correctly
-    });
-  }
-  async updateRole(id: number, dto: UpdateRoleDto): Promise<Role> {
-    const role = await this.findRoleById(id);
-    Object.assign(role!, dto);
-    return this.roleRepository.save(role!);
+  // Find role by id
+  async findRoleById(roleId: number): Promise<Role> {
+    const role = await this.roleRepository
+      .createQueryBuilder('role')
+      .where('role.id = :id', { id: roleId })
+      .getOne();
+
+    if (!role) {
+      throw new NotFoundException(`Role with ID ${roleId} not found`);
+    }
+
+    return role;
   }
 
+  // Update role using query builder update
+  async updateRole(id: number, dto: UpdateRoleDto): Promise<Role> {
+    const existingRole = await this.findRoleById(id);
+    if (!existingRole) {
+      throw new NotFoundException(`Role with ID ${id} not found`);
+    }
+
+    await this.roleRepository
+      .createQueryBuilder()
+      .update(Role)
+      .set(dto)
+      .where('id = :id', { id })
+      .execute();
+
+    // Return updated role
+    return this.findRoleById(id);
+  }
+
+  // Delete role using query builder delete
   async deleteRole(id: number): Promise<{ message: string }> {
-    const role = await this.findRoleById(id);
-    await this.roleRepository.remove(role!);
-    return { message: `Role '${role!.name}' deleted successfully` };
+    const existingRole = await this.findRoleById(id);
+    if (!existingRole) {
+      throw new NotFoundException(`Role with ID ${id} not found`);
+    }
+
+    await this.roleRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Role)
+      .where('id = :id', { id })
+      .execute();
+
+    return { message: `Role '${existingRole.name}' deleted successfully` };
   }
 }

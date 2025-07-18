@@ -6,10 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subject } from './subjects.entity';
-import { StudentSubject } from '../junctionTables/student_subjects.entity';
+import { StudentSubject } from '../middleTables/student_subjects.entity';
 import { User } from '../users/user.entity';
 import { UpdateSubjectDto } from './dtos/update-subject.dto';
-import { StudentFaculty } from '../junctionTables/student_faculty.entity';
+import { StudentFaculty } from '../middleTables/student_faculty.entity';
 
 @Injectable()
 export class SubjectsService {
@@ -27,16 +27,26 @@ export class SubjectsService {
     private readonly studentFacultyRepository: Repository<StudentFaculty>,
   ) {}
 
-  async createSubject(name: string) {
+  async createSubject(name: string): Promise<Subject> {
     const newSubject = this.subjectRepository.create({ name });
-    return await this.subjectRepository.save(newSubject);
+    const insertResult = await this.subjectRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Subject)
+      .values(newSubject)
+      .execute();
+
+    // Return the inserted subject with generated ID
+    return this.subjectRepository.findOneOrFail({
+      where: { id: insertResult.identifiers[0].id },
+    });
   }
 
-  async findAll() {
+  async findAll(): Promise<Subject[]> {
     return await this.subjectRepository.find();
   }
 
-  async findById(id: number) {
+  async findById(id: number): Promise<Subject> {
     const subject = await this.subjectRepository.findOne({ where: { id } });
     if (!subject) {
       throw new NotFoundException(`Subject with ID ${id} not found`);
@@ -44,20 +54,40 @@ export class SubjectsService {
     return subject;
   }
 
-  async deleteSubject(id: number) {
-    const deleteResult = await this.subjectRepository.delete(id);
+  async deleteSubject(id: number): Promise<void> {
+    const deleteResult = await this.subjectRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Subject)
+      .where('id = :id', { id })
+      .execute();
+
     if (deleteResult.affected === 0) {
       throw new NotFoundException(`Subject with ID ${id} not found`);
     }
   }
 
-  async updateSubject(id: number, dto: UpdateSubjectDto) {
+  async updateSubject(id: number, dto: UpdateSubjectDto): Promise<Subject> {
     const subject = await this.findById(id);
-    Object.assign(subject, dto);
-    return this.subjectRepository.save(subject);
+
+    // Manually update fields from dto
+    if (dto.name !== undefined) subject.name = dto.name;
+
+    await this.subjectRepository
+      .createQueryBuilder()
+      .update(Subject)
+      .set({ name: subject.name })
+      .where('id = :id', { id })
+      .execute();
+
+    // Return updated subject
+    return this.findById(id);
   }
 
-  async registerStudentToSubject(studentId: string, subjectId: number) {
+  async registerStudentToSubject(
+    studentId: string,
+    subjectId: number,
+  ): Promise<StudentSubject> {
     const student = await this.userRepository.findOne({
       where: { id: studentId },
     });
@@ -91,10 +121,20 @@ export class SubjectsService {
       subject,
     });
 
-    return await this.studentSubjectRepository.save(studentSubject);
+    const insertResult = await this.studentSubjectRepository
+      .createQueryBuilder()
+      .insert()
+      .into(StudentSubject)
+      .values(studentSubject)
+      .execute();
+
+    return this.studentSubjectRepository.findOneOrFail({
+      where: { id: insertResult.identifiers[0].id },
+      relations: ['student', 'subject'],
+    });
   }
 
-  async updateStudentFacultyRelations(subjectId: number) {
+  async updateStudentFacultyRelations(subjectId: number): Promise<void> {
     const userSubjects = await this.studentSubjectRepository.find({
       where: { subject: { id: subjectId } },
       relations: ['student'],
@@ -131,7 +171,12 @@ export class SubjectsService {
             faculty: { id: faculty.userId },
           });
 
-          await this.studentFacultyRepository.save(relation);
+          await this.studentFacultyRepository
+            .createQueryBuilder()
+            .insert()
+            .into(StudentFaculty)
+            .values(relation)
+            .execute();
         }
       }
     }

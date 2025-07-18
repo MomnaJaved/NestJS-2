@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StudentSubject } from '../junctionTables/student_subjects.entity';
-import { StudentFaculty } from '../junctionTables/student_faculty.entity';
+import { StudentSubject } from '../middleTables/student_subjects.entity';
+import { StudentFaculty } from '../middleTables/student_faculty.entity';
 
 @Injectable()
 export class RolesOrOwnerFacultyGuard implements CanActivate {

@@ -27,7 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { UpdateAttendanceDto } from './dtos/update-attendance.dto';
 
-@ApiTags('attendance') // Adds a tag for all routes in this controller
+@ApiTags('Attendance') // Adds a tag for all routes in this controller
 @Controller('attendance')
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}

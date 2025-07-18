@@ -25,7 +25,7 @@ import { JwtGuard } from '../guards/jwt.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { UpdateSubjectDto } from './dtos/update-subject.dto';
 
-@ApiTags('subjects') // Tagging all routes in this controller under the 'subjects' category
+@ApiTags('Subjects') // Tagging all routes in this controller under the 'subjects' category
 @Controller('subjects')
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}

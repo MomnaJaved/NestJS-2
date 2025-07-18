@@ -23,7 +23,7 @@ import { JwtGuard } from '../guards/jwt.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { UpdateRoleDto } from './dtos/update-role.dto';
 
-@ApiTags('roles') // Tagging all routes in this controller under the 'roles' category
+@ApiTags('Roles') // Tagging all routes in this controller under the 'roles' category
 @Controller('roles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}

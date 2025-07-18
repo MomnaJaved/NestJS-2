@@ -6,7 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Subject } from '../subjects/subjects.entity';
-import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
+import { AttendanceRecord } from '../middleTables/attendance_record.entity';
 
 @Entity()
 export class Attendance {
@@ -15,8 +15,8 @@ export class Attendance {
 
   @Column({ type: 'date', default: () => 'CURRENT_DATE' })
   date: string;
-  // Eager automatically loads the related Subject entity whenever an Attendance is fetched, no need to additionally define a relation.
-  @ManyToOne(() => Subject, (subject) => subject.attendances, { eager: true })
+
+  @ManyToOne(() => Subject, (subject) => subject.attendances)
   subject: Subject;
 
   @OneToMany(() => AttendanceRecord, (record) => record.attendance)

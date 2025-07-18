@@ -1,36 +1,39 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+
 import { Role } from './roles/role.entity';
 import { User } from './users/user.entity';
 import { Department } from './departments/department.entity';
 import { Attendance } from './attendance/attendance.entity';
-import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Subject } from './subjects/subjects.entity';
+import { AttendanceRecord } from './middleTables/attendance_record.entity';
+import { StudentSubject } from './middleTables/student_subjects.entity';
+import { StudentFaculty } from './middleTables/student_faculty.entity';
+
 import { AdminSeed } from './seeding/admin.seed';
+
 import { RoleModule } from './roles/role.module';
 import { DepartmentModule } from './departments/department.module';
 import { UserModule } from './users/user.module';
-import { AttendanceModule } from './attendance/attendance.module';
 import { AuthModule } from './auth/auth.module';
 import { SubjectsModule } from './subjects/subjects.module';
-import { Subject } from './subjects/subjects.entity';
-import { AttendanceRecord } from './junctionTables/attendance_record.entity';
-import { StudentSubject } from './junctionTables/student_subjects.entity';
-import { MiddlewareConsumer } from '@nestjs/common';
+import { AttendanceModule } from './attendance/attendance.module';
+
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { StudentFaculty } from './junctionTables/student_faculty.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: +(process.env.DB_PORT || 5433),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'Momna292003.',
-      database: process.env.DB_DATABASE || 'Attendance',
+      host: process.env.DB_HOST,
+      port: +(process.env.DB_PORT as string),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       entities: [
         Role,
         User,
@@ -41,7 +44,6 @@ import { StudentFaculty } from './junctionTables/student_faculty.entity';
         StudentSubject,
         StudentFaculty,
       ],
-      synchronize: true,
     }),
     RoleModule,
     DepartmentModule,
@@ -50,8 +52,8 @@ import { StudentFaculty } from './junctionTables/student_faculty.entity';
     SubjectsModule,
     AttendanceModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AdminSeed],
+  controllers: [],
+  providers: [AdminSeed],
   exports: [AdminSeed],
 })
 export class AppModule {

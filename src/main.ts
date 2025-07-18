@@ -1,4 +1,6 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -7,9 +9,13 @@ import { ErrorLoggingInterceptor } from './interceptors/error-logging.intercepto
 import { ResponseTimeInterceptor } from './interceptors/response-time.interceptor';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AdminSeed } from './seeding/admin.seed';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // You can run seeding here:
+  const adminSeed = app.get(AdminSeed);
+  await adminSeed.run();
 
   // Set up Swagger
   const options = new DocumentBuilder()

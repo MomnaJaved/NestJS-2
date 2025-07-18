@@ -23,7 +23,7 @@ import { JwtGuard } from '../guards/jwt.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { UpdateDepartmentDto } from './dtos/update-department.dto';
 
-@ApiTags('departments') // Tagging all routes in this controller under the 'departments' category
+@ApiTags('Departments') // Tagging all routes in this controller under the 'departments' category
 @Controller('departments')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}

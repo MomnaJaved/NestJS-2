@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Injectable,
   NestInterceptor,
@@ -8,10 +7,15 @@ import {
 import { Observable, map } from 'rxjs';
 
 @Injectable()
-export class TransformInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+export class TransformInterceptor<T>
+  implements NestInterceptor<T, { status: string; data: T }>
+{
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler<T>,
+  ): Observable<{ status: string; data: T }> {
     return next.handle().pipe(
-      map((data) => ({
+      map((data: T) => ({
         status: 'success',
         data,
       })),

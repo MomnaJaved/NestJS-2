@@ -12,19 +12,28 @@ export class DepartmentService {
     private readonly departmentRepository: Repository<Department>,
   ) {}
 
-  // Create department
-  async createDepartment(createDepartmentDto: CreateDepartmentDto) {
-    const department = this.departmentRepository.create(createDepartmentDto);
-    return this.departmentRepository.save(department);
+  // Create department using insert
+  async createDepartment(
+    createDepartmentDto: CreateDepartmentDto,
+  ): Promise<Department> {
+    const insertResult = await this.departmentRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Department)
+      .values(createDepartmentDto)
+      .execute();
+
+    const insertedId = insertResult.identifiers[0].id;
+    return this.getDepartmentById(insertedId);
   }
 
   // Get all departments
-  async getAllDepartments() {
+  async getAllDepartments(): Promise<Department[]> {
     return this.departmentRepository.find();
   }
 
   // Get department by ID
-  async getDepartmentById(id: string) {
+  async getDepartmentById(id: string): Promise<Department> {
     const department = await this.departmentRepository.findOne({
       where: { id },
     });
@@ -34,15 +43,38 @@ export class DepartmentService {
     return department;
   }
 
-  async updateDepartment(id: string, updateDto: UpdateDepartmentDto) {
-    const department = await this.getDepartmentById(id);
-    Object.assign(department, updateDto);
-    return this.departmentRepository.save(department);
+  // Update department
+  async updateDepartment(
+    id: string,
+    updateDto: UpdateDepartmentDto,
+  ): Promise<Department> {
+    const updateResult = await this.departmentRepository
+      .createQueryBuilder()
+      .update(Department)
+      .set(updateDto)
+      .where('id = :id', { id })
+      .execute();
+
+    if (updateResult.affected === 0) {
+      throw new NotFoundException(`Department with ID ${id} not found`);
+    }
+
+    return this.getDepartmentById(id);
   }
 
-  async deleteDepartment(id: string) {
-    const department = await this.getDepartmentById(id);
-    await this.departmentRepository.remove(department);
+  // Delete department
+  async deleteDepartment(id: string): Promise<{ message: string }> {
+    const deleteResult = await this.departmentRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Department)
+      .where('id = :id', { id })
+      .execute();
+
+    if (deleteResult.affected === 0) {
+      throw new NotFoundException(`Department with ID ${id} not found`);
+    }
+
     return { message: `Department with ID ${id} deleted successfully` };
   }
 }

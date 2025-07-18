@@ -7,15 +7,20 @@ import { UserService } from '../users/user.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly usersService: UserService) {
+    const secret = process.env.JWT_SECRET_KEY;
+    if (!secret) {
+      throw new Error('JWT_SECRET_KEY environment variable is not set');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'JWT_SECRET_KEY',
+      secretOrKey: secret,
     });
   }
 
   async validate(payload: JwtPayload) {
     const { email } = payload;
-    const user = await this.usersService.findOneByEmail(email); // Find user by email
+    const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new UnauthorizedException();
     }

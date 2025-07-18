@@ -1,19 +1,25 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { Subject } from './subjects.entity';
 import { SubjectsService } from './subjects.service';
 import { SubjectsController } from './subjects.controller';
 import { User } from '../users/user.entity';
-import { StudentSubject } from '../junctionTables/student_subjects.entity';
-import { JwtModule } from '@nestjs/jwt';
-import { StudentFaculty } from '../junctionTables/student_faculty.entity';
+import { StudentSubject } from '../middleTables/student_subjects.entity';
+import { StudentFaculty } from '../middleTables/student_faculty.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Subject, User, StudentSubject, StudentFaculty]),
-    JwtModule.register({
-      secret: 'mySuperSecretKey12345',
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule], // optional if ConfigModule is global, but good for clarity
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET_KEY'),
+        signOptions: { expiresIn: '1h' },
+      }),
     }),
   ],
   providers: [SubjectsService],

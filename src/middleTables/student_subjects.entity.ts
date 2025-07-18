@@ -7,13 +7,11 @@ export class StudentSubject {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.studentSubjects, { eager: false })
+  @ManyToOne(() => User, (user) => user.studentSubjects)
   @JoinColumn({ name: 'student_id' })
   student: User;
 
-  @ManyToOne(() => Subject, (subject) => subject.studentSubjects, {
-    eager: false,
-  })
+  @ManyToOne(() => Subject, (subject) => subject.studentSubjects)
   @JoinColumn({ name: 'subject_id' })
   subject: Subject;
 }

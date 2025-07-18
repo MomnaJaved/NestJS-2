@@ -1,23 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/user.service';
 import { LoginDto } from './dtos/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { ConfigService } from '@nestjs/config';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
   // Validate user with bcrypt comparison
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.usersService.findOneByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       // Use bcrypt.compare to validate the password (hashed password comparison)
@@ -37,13 +34,19 @@ export class AuthService {
     const payload: JwtPayload = {
       email: user.email,
       sub: user.id,
-      role: user.role,
+      role: user.role.name,
     };
 
-    const secret = this.configService.get<string>('JWT_SECRET_KEY'); // Get secret from environment variables
+    // Get secret directly from environment variables
+    const secret = process.env.JWT_SECRET_KEY;
+    if (!secret) {
+      throw new UnauthorizedException(
+        'JWT secret key not set in environment variables',
+      );
+    }
 
     const accessToken = this.jwtService.sign(payload, {
-      secret, // Use the secret from the ConfigService
+      secret,
     });
 
     return {

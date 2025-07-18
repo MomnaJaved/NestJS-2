@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StudentSubject } from '../junctionTables/student_subjects.entity';
+import { StudentSubject } from '../middleTables/student_subjects.entity';
 
 @Injectable()
 export class FacultySubjectAccessGuard implements CanActivate {

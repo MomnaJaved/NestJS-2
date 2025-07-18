@@ -1,13 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { UserPayload } from '../auth/interfaces/user-payload.interface';
 
 export const User = createParamDecorator(
-  (data: string | undefined, ctx: ExecutionContext) => {
+  <K extends keyof UserPayload>(
+    data: K | undefined,
+    ctx: ExecutionContext,
+  ): UserPayload[K] | UserPayload | null => {
     const request = ctx.switchToHttp().getRequest();
-    const user = request.user as { [key: string]: any } | undefined;
+    const user = request.user as UserPayload | undefined;
     if (!user) return null;
-    return data ? user[data] : user;
+
+    if (data) {
+      return user[data];
+    }
+    return user;
   },
 );

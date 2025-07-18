@@ -6,11 +6,10 @@ import { AttendanceService } from './attendance.service';
 import { User } from '../users/user.entity';
 import { Department } from '../departments/department.entity';
 import { Subject } from '../subjects/subjects.entity';
-import { AttendanceRecord } from '../junctionTables/attendance_record.entity';
-import { JwtGuard } from '../guards/jwt.guard';
+import { AttendanceRecord } from '../middleTables/attendance_record.entity';
 import { AuthModule } from '../auth/auth.module';
-import { StudentSubject } from '../junctionTables/student_subjects.entity';
-import { StudentFaculty } from '../junctionTables/student_faculty.entity';
+import { StudentSubject } from '../middleTables/student_subjects.entity';
+import { StudentFaculty } from '../middleTables/student_faculty.entity';
 
 @Module({
   imports: [
@@ -26,7 +25,7 @@ import { StudentFaculty } from '../junctionTables/student_faculty.entity';
     ]),
   ],
   controllers: [AttendanceController],
-  providers: [AttendanceService, JwtGuard],
+  providers: [AttendanceService],
   exports: [TypeOrmModule],
 })
 export class AttendanceModule {}
