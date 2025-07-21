@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendance } from './attendance.entity';
 import { AttendanceRecord } from '../middleTables/attendance_record.entity';
-import { Repository, InsertResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { StudentSubject } from '../middleTables/student_subjects.entity';
 import { User } from '../users/user.entity';
 import { AttendanceStatus } from '../common/attendance-status.enum';
@@ -70,11 +70,11 @@ export class AttendanceService {
     const date = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
 
     // Insert attendance entry
-    const attendanceInsert: InsertResult = await this.attendanceRepo
+    const attendanceInsert = await this.attendanceRepo
       .createQueryBuilder()
       .insert()
-      .into(Attendance)
-      .values({ date, subject: { id: subjectId } })
+      .into('attendance')
+      .values({ date, subjectId })
       .execute();
 
     const attendanceId = attendanceInsert.identifiers[0].id;
@@ -176,7 +176,7 @@ export class AttendanceService {
 
     return {
       subjectId,
-      subjectName: records[0]?.subject?.name || '',
+      subjectName: records[0]?.subject?.name,
       students: Object.values(grouped),
     };
   }
