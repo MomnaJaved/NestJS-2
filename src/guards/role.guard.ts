@@ -5,8 +5,6 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { User } from '../users/user.entity';
-import { Role } from '../roles/role.entity';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -20,21 +18,22 @@ export class RoleGuard implements CanActivate {
       return true; // If no roles are specified, allow access
     }
 
+    console.log('role from metadata ', roles);
     const request = context.switchToHttp().getRequest();
-    const user: User = request.user; // Explicitly type the user as User
+    const user = request.user; // Get the user object from the request
 
     if (!user) {
       throw new ForbiddenException('User not authenticated');
     }
 
-    const userRole: Role = user.role; // Explicitly type the user's role as Role
+    const userRole = user.role;
 
     if (!userRole) {
       throw new ForbiddenException('User role is not defined');
     }
 
-    // Check if the user's role is in the allowed roles
-    if (!roles.includes(userRole.name)) {
+    // Check if the user's role matches the required roles
+    if (!roles.includes(userRole)) {
       throw new ForbiddenException(
         'You do not have permission to access this resource',
       );

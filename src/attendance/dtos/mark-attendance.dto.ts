@@ -20,7 +20,7 @@ export class MarkAttendanceDto {
   @ApiProperty({
     enum: AttendanceStatus,
     example: AttendanceStatus.PRESENT,
-    description: 'Status of attendance',
+    description: 'Status of attendance like "Present", "absent"',
   })
   @IsEnum(AttendanceStatus)
   status: AttendanceStatus;

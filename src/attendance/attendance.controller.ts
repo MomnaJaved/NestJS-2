@@ -66,7 +66,6 @@ export class AttendanceController {
 
   @Get('viewAttendance/:subjectId')
   @ApiBearerAuth()
-  @Roles('Faculty')
   @ApiOperation({ summary: 'View all attendance for a subject' })
   @ApiParam({ name: 'subjectId', description: 'The ID of the subject' })
   @ApiResponse({ status: 200, description: 'Attendance data for the subject.' })
@@ -74,11 +73,23 @@ export class AttendanceController {
     status: 403,
     description: 'Forbidden: Faculty cannot access unauthorized subjects.',
   })
-  @UseGuards(JwtGuard, RoleGuard, FacultySubjectAccessGuard)
+  @UseGuards(JwtGuard, FacultySubjectAccessGuard)
   async viewAllAttendanceDetails(@Param('subjectId') subjectId: number) {
     return this.attendanceService.viewAllAttendance(subjectId);
   }
 
+  @Get(':id')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get an attendance record by ID' })
+  @ApiParam({ name: 'id', description: 'The ID of the attendance record' })
+  @ApiResponse({ status: 200, description: 'Attendance record found.' })
+  @ApiResponse({ status: 404, description: 'Attendance record not found.' })
+  @ApiResponse({ status: 403, description: 'Forbidden: Unauthorized access.' })
+  @UseGuards(JwtGuard, RoleGuard)
+  async getAttendanceRecordById(@Param('id') id: number) {
+    return this.attendanceService.getAttendanceRecordById(id);
+  }
   @Put(':id')
   @Roles('Faculty', 'admin')
   @ApiBearerAuth()
@@ -90,12 +101,12 @@ export class AttendanceController {
     status: 400,
     description: 'Invalid data or missing permissions.',
   })
-  @UseGuards(JwtGuard, RoleGuard) // Ensure user has correct permissions
+  @UseGuards(JwtGuard, RoleGuard)
   async updateAttendance(
-    @Param('id', ParseIntPipe) id: number, // Use ParseIntPipe to convert the id to a number
-    @Body() dto: UpdateAttendanceDto, // Get the data to update the attendance
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateAttendanceDto,
   ) {
-    return this.attendanceService.updateAttendance(id, dto.status); // Call the service method
+    return this.attendanceService.updateAttendance(id, dto.status);
   }
 
   @Delete(':id')

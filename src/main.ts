@@ -22,7 +22,6 @@ async function bootstrap() {
     .setTitle('Attendance Management System API')
     .setDescription('API documentation for Attendance Management System')
     .setVersion('1.0.0')
-    .addTag('attendance')
     .addBearerAuth() // This enables JWT Bearer authentication in Swagger UI
     .build();
 

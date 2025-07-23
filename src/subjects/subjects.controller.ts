@@ -114,22 +114,4 @@ export class SubjectsController {
   ) {
     return this.subjectsService.updateSubject(id, dto);
   }
-
-  @Post(':id/update-relations')
-  @Roles('admin')
-  @UseGuards(JwtGuard, RoleGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update faculty-student relations for a subject' })
-  @ApiParam({
-    name: 'id',
-    description: 'Subject ID to update faculty-student relations',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Faculty-student relations updated successfully.',
-  })
-  @ApiResponse({ status: 404, description: 'Subject not found.' })
-  async updateFacultyStudentRelations(@Param('id', ParseIntPipe) id: number) {
-    return this.subjectsService.updateStudentFacultyRelations(id);
-  }
 }

@@ -86,8 +86,8 @@ export class AdminSeed {
       .insert()
       .into(User)
       .values({
-        firstName: 'Javed',
-        lastName: 'Iqbal',
+        firstName: 'Jalal',
+        lastName: 'Junaid',
         password: hashedPassword,
         contact: '03123456789',
         email: process.env.DEFAULT_ADMIN_EMAIL,
@@ -101,11 +101,12 @@ export class AdminSeed {
         joiningDate: new Date('2020-01-01'),
         probationPeriod: '6 months',
         program: 'Admin Program',
-        role: { id: adminRole.id },
-        department: { id: department.id },
+        role: adminRole,
+        department: department,
       })
       .execute();
 
     console.log('Admin user created successfully!');
+    console.log('Seeding admin with role:', adminRole.name);
   }
 }

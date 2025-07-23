@@ -9,7 +9,7 @@ export class RegisterSubjectDto {
   @IsUUID()
   studentId: string;
 
-  @ApiProperty({ example: 101, description: 'ID of the subject' })
+  @ApiProperty({ example: 1, description: 'ID of the subject' })
   @IsInt()
   subjectId: number;
 }

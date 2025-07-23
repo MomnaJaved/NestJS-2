@@ -49,8 +49,8 @@ export class AttendanceService {
     // Check if student is registered in the subject
     const registeredCount = await this.studentSubjectRepo
       .createQueryBuilder('ss')
-      .where('ss.studentId = :studentId', { studentId })
-      .andWhere('ss.subjectId = :subjectId', { subjectId })
+      .where('ss.student_Id = :studentId', { studentId })
+      .andWhere('ss.subject_Id = :subjectId', { subjectId })
       .getCount();
 
     if (registeredCount === 0) {
@@ -136,7 +136,6 @@ export class AttendanceService {
       subjects: Object.values(grouped),
     };
   }
-
   async viewAllAttendance(subjectId: number): Promise<AttendanceSummary> {
     const records = await this.attendanceRecordRepo
       .createQueryBuilder('record')
@@ -156,6 +155,7 @@ export class AttendanceService {
       }
     > = {};
 
+    // Group the attendance by studentId
     for (const rec of records) {
       const studentId = rec.student.id;
       const studentName = `${rec.student.firstName} ${rec.student.lastName}`;
@@ -168,16 +168,20 @@ export class AttendanceService {
         };
       }
 
+      // Ensure the date is correctly converted to a Date object
+      const attendanceDate = new Date(rec.attendance.date);
+
+      // Add attendance data for each student
       grouped[studentId].attendance.push({
-        date: new Date(rec.attendance.date),
-        status: rec.status,
+        date: attendanceDate, // Store as Date object
+        status: rec.status, // Attendance status (e.g., present/absent)
       });
     }
 
     return {
       subjectId,
-      subjectName: records[0]?.subject?.name,
-      students: Object.values(grouped),
+      subjectName: records[0]?.subject?.name || 'Unknown Subject', // Handle case when subject is missing
+      students: Object.values(grouped), // Return the grouped data as an array
     };
   }
 
@@ -187,6 +191,12 @@ export class AttendanceService {
       .innerJoinAndSelect('record.attendance', 'attendance')
       .innerJoinAndSelect('record.subject', 'subject')
       .innerJoinAndSelect('record.student', 'student')
+      .addSelect([
+        'attendance.date',
+        'subject.name',
+        'student.firstName',
+        'student.lastName',
+      ])
       .where('record.id = :id', { id })
       .getOne();
 

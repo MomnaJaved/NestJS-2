@@ -1,8 +1,8 @@
 import {
+  Injectable,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
-  Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,39 +20,41 @@ export class RolesOrOwnerFacultyGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<{
-      user?: { sub: string; role: { name: string } };
-      params: { studentId?: string };
-    }>();
-
-    const user = request.user;
-    const studentIdParam = request.params.studentId;
+    const request = context.switchToHttp().getRequest();
+    const user = request.user; // Get the user object from the request
+    const studentIdParam = request.params.studentId; // Get the studentId from the URL
 
     if (!user) {
-      return false;
+      throw new ForbiddenException('User not authenticated');
     }
 
-    if (user.role.name === 'Student') {
+    // Allow access to the student only for their own attendance records
+    if (user.role === 'Student') {
       if (user.sub !== studentIdParam) {
         throw new ForbiddenException(
           'Students can only access their own attendance records',
         );
       }
-      return true;
+      return true; // Allow student to access their own attendance
     }
 
-    if (user.role.name === 'admin') {
-      return true;
+    //Allow admin to access all attendance records
+    if (user.role === 'admin') {
+      return true; // Allow admin access to all records
     }
 
-    if (user.role.name === 'Faculty') {
+    //Allow faculty to access student attendance if they are assigned to the student
+    if (user.role === 'Faculty') {
       if (!studentIdParam) {
         throw new ForbiddenException('Student ID parameter missing');
       }
-      const facultyId = user.sub;
-      const studentId = studentIdParam;
 
-      // Check if faculty and student have a relation
+      const facultyId = user.sub; // Faculty ID from JWT token
+      const studentId = studentIdParam; // Student ID from URL parameter
+
+      console.log('Faculty ID:', facultyId); // Debugging the faculty ID
+
+      // Check if faculty and student have a relation in the `StudentFaculty` table
       const relationExists = await this.studentFacultyRepo.findOne({
         where: {
           faculty: { id: facultyId },
@@ -64,33 +66,10 @@ export class RolesOrOwnerFacultyGuard implements CanActivate {
         throw new ForbiddenException('Faculty is not related to this student');
       }
 
-      // Check if faculty and student share at least one subject
-      const facultySubjects = await this.studentSubjectRepo.find({
-        where: { student: { id: facultyId } },
-        relations: ['subject'],
-      });
-
-      const studentSubjects = await this.studentSubjectRepo.find({
-        where: { student: { id: studentId } },
-        relations: ['subject'],
-      });
-
-      const facultySubjectIds = facultySubjects.map((s) => s.subject.id);
-      const studentSubjectIds = studentSubjects.map((s) => s.subject.id);
-
-      const commonSubject = facultySubjectIds.find((id) =>
-        studentSubjectIds.includes(id),
-      );
-
-      if (!commonSubject) {
-        throw new ForbiddenException(
-          'Faculty and student do not share any subjects',
-        );
-      }
-
-      return true;
+      return true; // Allow faculty access to this student's attendance
     }
 
+    // Default fallback: If none of the roles match, deny access
     throw new ForbiddenException('Access denied');
   }
 }
