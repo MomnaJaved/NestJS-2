@@ -1,0 +1,30 @@
+# Build and dependencies
+/dist
+/node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# System files
+.DS_Store
+
+# VS Code settings
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Environment variables
+.env
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports
+report.*.json
