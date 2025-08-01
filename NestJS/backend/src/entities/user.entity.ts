@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { StudentSubject } from '../middleTables/student_subjects.entity';
 import { StudentFaculty } from '../middleTables/student_faculty.entity';
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -32,7 +33,7 @@ export class User {
   @Column({ unique: true, type: 'varchar', length: 56 })
   email: string;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   status: boolean;
 
   @Column({ type: 'varchar', length: 8, nullable: true })

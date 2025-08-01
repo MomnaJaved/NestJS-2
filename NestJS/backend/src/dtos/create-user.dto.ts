@@ -3,7 +3,6 @@ import {
   MaxLength,
   MinLength,
   IsEmail,
-  IsBoolean,
   IsUUID,
   IsOptional,
   IsDateString,
@@ -24,7 +23,7 @@ export class CreateUserDto {
 
   @ApiProperty({ minLength: 6, maxLength: 24, example: 'securePassword123' })
   @IsString()
-  @MinLength(6, { message: 'Password should have at least 6 characters.' })
+  @MinLength(6)
   @MaxLength(24)
   password: string;
 
@@ -37,11 +36,7 @@ export class CreateUserDto {
   @MaxLength(56)
   email: string;
 
-  @ApiProperty({ example: true })
-  @IsBoolean()
-  status: boolean;
-
-  @ApiProperty({ maxLength: 8, example: 'EMP001' })
+  @ApiPropertyOptional({ maxLength: 8, example: 'EMP001' })
   @IsString()
   @MaxLength(8)
   @IsOptional()
@@ -105,12 +100,12 @@ export class CreateUserDto {
   @IsOptional()
   programDuration?: string;
 
-  @ApiProperty({ example: 1 })
+  @ApiPropertyOptional({ example: 1 })
   @IsInt()
   @IsOptional()
   roleId?: number;
 
-  @ApiProperty({ example: 'a3c6a1b9-3b98-4e2a-8e89-923c71e0f1bc' })
+  @ApiPropertyOptional({ example: 'a3c6a1b9-3b98-4e2a-8e89-923c71e0f1bc' })
   @IsUUID()
   @IsOptional()
   departmentId?: string;
