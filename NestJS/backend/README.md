@@ -12,7 +12,7 @@
   <a href="https://www.npmjs.com/package/@nestjs/common" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
 </p>
 
-## 📘 Description
+## Description
 
 This is the backend API for the **University Attendance Management System**, built using [NestJS](https://nestjs.com/). It includes:
 
