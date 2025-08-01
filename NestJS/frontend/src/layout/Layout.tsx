@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import bgVideo from '../assets/hero/bg.mp4';
-
+//main layout of the web page
 export default function MainLayout() {
   return (
     <div className="relative min-h-screen">

@@ -1,69 +1,66 @@
-# React + TypeScript + Vite
+# University Attendance Management System – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **frontend** of the University Attendance Management System built using **React**, **TypeScript**, and **Vite**. It includes responsive UI forms, routing, toast notifications, and video background layout.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React** (Component-based UI)
+- **TypeScript** (Type safety)
+- **Vite** (Fast build tool)
+- **React Router DOM** (Page navigation)
+- **Axios** (API requests)
+- **React Toastify** (Notifications)
+- **Tailwind CSS** (Utility-first CSS)
+- **@headlessui/react** + **@heroicons/react** (Accessible and stylish dropdowns)
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Sign Up & Login Forms with validation
+- Form dropdowns (gender, marital status)
+- Form submission via Axios to backend
+- Toast notifications for success and error handling
+- Layout with animated background video
+- Dashboard and Landing pages with clean design
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### 1. Install dependencies
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Run the development server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+npm run dev
 ```
+
+> Vite will start a dev server, usually at `http://localhost:5173`
+
+### 3. Backend API
+
+This frontend expects a backend running at:
+
+http://localhost:3001
+
+Make sure the backend is running before testing login/signup.
+
+## Customization
+
+- **API Endpoints** are hardcoded (`/auth/signup`, `/auth/login`). You can extract them into a `config.ts` file for cleaner management.
+- **User types** are located in `types/user.ts`.
+
+## Notes
+
+- The **video background** is loaded from `/assets/hero/bg.mp4` and blurred using `backdrop-blur-sm`.
+- The **form dropdowns** use `@headlessui/react` for accessibility and beautiful interaction.
+- Styling is primarily done using **Tailwind CSS** classes with custom colors.
+
+## Linting & Formatting
+
+This project uses **TypeScript**, but no advanced ESLint configuration is currently added. You can expand lint rules if needed for production.
+
+## License
+
+This project is for educational/demo purposes and not production-ready.

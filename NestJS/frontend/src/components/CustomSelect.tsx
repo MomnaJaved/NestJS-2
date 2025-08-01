@@ -1,7 +1,7 @@
 import { Listbox } from '@headlessui/react';
 import { Fragment } from 'react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
-
+//custom select used to improve UI
 type CustomSelectProps = {
   label: string;
   value: string;

@@ -5,7 +5,7 @@ import SignUpPage from '../pages/Signup';
 import LoginPage from '../pages/Login';
 import MainLayout from '../layout/Layout';
 import Dashboard from '../pages/Dashboard';
-
+//app router
 const AppRouter = () => {
   return (
     <Router>
