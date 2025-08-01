@@ -10,7 +10,7 @@ import { ResponseTimeInterceptor } from './interceptors/response-time.intercepto
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AdminSeed } from './seeding/admin.seed';
-
+//main ts
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // You can run seeding here:

@@ -9,7 +9,7 @@ import {
   IsInt,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
+//create-userdto
 export class CreateUserDto {
   @ApiProperty({ maxLength: 24, example: 'John' })
   @IsString()

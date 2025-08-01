@@ -24,7 +24,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { UserService } from './services/user.service';
 import { AuthService } from './services/auth.service';
 import { EmailService } from './services/emailService';
-
+//app module
 @Module({
   imports: [
     ConfigModule.forRoot({

@@ -61,6 +61,8 @@ Make sure the backend is running before testing login/signup.
 
 This project uses **TypeScript**, but no advanced ESLint configuration is currently added. You can expand lint rules if needed for production.
 
+## 📷 Preview
+
 ## License
 
 This project is for educational/demo purposes and not production-ready.

@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { StudentSubject } from '../middleTables/student_subjects.entity';
 import { StudentFaculty } from '../middleTables/student_faculty.entity';
-
+//user entity
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
