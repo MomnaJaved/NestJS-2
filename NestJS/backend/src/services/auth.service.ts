@@ -25,8 +25,8 @@ export class AuthService {
   public async signup(
     createUserDto: CreateUserDto,
   ): Promise<{ message: string }> {
-    const existingUser = await this.userRepository.findOneBy({
-      email: createUserDto.email,
+    const existingUser = await this.userRepository.findOne({
+      where: [{ email: createUserDto.email }, { CNIC: createUserDto.CNIC }],
     });
 
     if (existingUser) {

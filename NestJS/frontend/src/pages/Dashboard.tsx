@@ -1,4 +1,3 @@
-import React from 'react';
 //when the login is successful user gets navigated to the dashboard
 export default function Dashboard() {
   return (
