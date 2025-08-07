@@ -24,9 +24,11 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { UserService } from './services/user.service';
 import { AuthService } from './services/auth.service';
 import { EmailService } from './services/emailService';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 //app module
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

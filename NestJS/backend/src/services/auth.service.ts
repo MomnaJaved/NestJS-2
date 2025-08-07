@@ -11,7 +11,8 @@ import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmailService } from './emailService';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
-//auth service
+import { EventEmitter2 } from '@nestjs/event-emitter'; // Import EventEmitter
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,6 +20,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly eventEmitter: EventEmitter2, // Inject EventEmitter
   ) {}
 
   // Signup method
@@ -43,11 +45,12 @@ export class AuthService {
 
     await this.userRepository.insert(newUser);
 
-    await this.emailService.sendEmail(
-      newUser.email,
-      newUser.firstName,
-      unhashedPassword,
-    );
+    // Emit 'user.signedUp' event
+    this.eventEmitter.emit('user.signedUp', {
+      email: newUser.email,
+      firstName: newUser.firstName,
+      password: unhashedPassword,
+    });
 
     return { message: 'User created successfully' };
   }
@@ -58,39 +61,39 @@ export class AuthService {
     password: string,
   ): Promise<{ access_token: string }> {
     try {
-      // Fetch the user
       const user = await this.userRepository.findOne({
         where: { email },
       });
 
       if (!user) {
-        throw new UnauthorizedException('Invalid email'); // Custom message for incorrect email
+        throw new UnauthorizedException('Invalid email');
       }
 
-      // Check if the password matches
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new UnauthorizedException('Incorrect password'); // Custom message for incorrect password
+        throw new UnauthorizedException('Incorrect password');
       }
 
-      // Generate JWT token (without role)
       const payload: JwtPayload = {
         email: user.email,
-        sub: user.id, // This is the user ID that will be used as the 'sub' claim
+        sub: user.id,
       };
 
-      const accessToken = this.jwtService.sign(payload); // Sign the payload to create a JWT token
+      const accessToken = this.jwtService.sign(payload);
+
+      // Emit 'user.loggedIn' event
+      this.eventEmitter.emit('user.loggedIn', {
+        email: user.email,
+      });
 
       return { access_token: accessToken };
     } catch (error) {
       console.error(error);
 
-      // Check if the error is due to a specific issue (email or password)
       if (error instanceof UnauthorizedException) {
-        throw error; // Re-throw the UnauthorizedException to preserve the specific error message
+        throw error;
       }
 
-      // For any other error, return a more generic message
       throw new UnauthorizedException(
         'Something went wrong. Please try again later.',
       );

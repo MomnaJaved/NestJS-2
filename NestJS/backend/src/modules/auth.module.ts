@@ -12,6 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './role.module';
 import { DepartmentModule } from './department.module';
 import { EmailService } from '../services/emailService';
+import { AuthEventsListener } from '../listeners/auth-events.listener';
 //auth module
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { EmailService } from '../services/emailService';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, EmailService],
+  providers: [AuthService, EmailService, AuthEventsListener],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
