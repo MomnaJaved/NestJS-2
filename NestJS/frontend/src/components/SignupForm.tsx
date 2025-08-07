@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '../types/user';
 import CustomSelect from './CustomSelect';
-
+//Sign up form component
 const SignUpForm = () => {
   const [formData, setFormData] = useState<User>({
     firstName: '',

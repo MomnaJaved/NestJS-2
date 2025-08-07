@@ -1,4 +1,4 @@
-// src/interfaces/jwt-payload.interface.ts
+//jwt interface
 export interface JwtPayload {
   email: string;
   sub: string; // User ID

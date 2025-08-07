@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
-
+//jwt guard
 @Injectable()
 export class JwtGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}

@@ -1,11 +1,10 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from '../pages/LandingPage';
 import SignUpPage from '../pages/Signup';
 import LoginPage from '../pages/Login';
 import MainLayout from '../layout/Layout';
 import Dashboard from '../pages/Dashboard';
-
+//app router
 const AppRouter = () => {
   return (
     <Router>

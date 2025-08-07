@@ -12,7 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './role.module';
 import { DepartmentModule } from './department.module';
 import { EmailService } from '../services/emailService';
-
+//auth module
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),

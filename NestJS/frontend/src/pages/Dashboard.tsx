@@ -1,5 +1,4 @@
-import React from 'react';
-
+//when the login is successful user gets navigated to the dashboard
 export default function Dashboard() {
   return (
     <section className="flex flex-col items-center justify-center h-screen text-center px-6 z-20 relative bg-transparent font-sans">

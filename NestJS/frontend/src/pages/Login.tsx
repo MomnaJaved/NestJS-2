@@ -1,6 +1,5 @@
-import React from 'react';
 import LoginForm from '../components/LoginForm';
-
+//login page
 const LoginPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-transparent p-6">

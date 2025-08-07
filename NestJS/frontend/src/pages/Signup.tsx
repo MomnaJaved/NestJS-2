@@ -1,6 +1,5 @@
-import React from 'react';
 import SignUpForm from '../components/SignupForm';
-
+//signup page
 const SignUpPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-transparent p-6">
